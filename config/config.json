@@ -1,0 +1,9 @@
+{
+    "training_data": "custom_Data",
+    "task": "recognition",
+    "datasets": [
+        "iam",
+        "sroie"
+    ],
+    "ocr_system": "PaddleOCR"
+}
