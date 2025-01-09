@@ -1,11 +1,11 @@
 {
-    "skewing": {
+    "skew": {
+    
+    },
+    "distort": {
 
     },
-    "distortion": {
-
-    },
-    "blurring": {
+    "blur": {
         
     }
 }
