@@ -1,9 +1,20 @@
 {
-    "training_data": "custom_Data",
-    "task": "recognition",
-    "datasets": [
-        "iam",
-        "sroie"
-    ],
-    "ocr_system": "PaddleOCR"
+    "datasets": {
+        "funsd": "yes",
+        "iam_htr": "yes",
+        "iam_online": "yes",
+        "sroie": "yes",
+        "xfund_de": "yes",
+        "xfund_es": "yes",
+        "xfund_fr": "yes",
+        "xfund_it": "yes",
+        "xfund_ja": "yes",
+        "xfund_pt": "yes",
+        "xfund_zh": "yes"
+    },
+    "ocr-system": [
+        "doctr",
+        "mmocr",
+        "paddleocr"
+    ]
 }
