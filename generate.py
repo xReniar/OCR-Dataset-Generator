@@ -7,7 +7,7 @@ def main(args):
 
 def parse_args():
     config:dict = json.load(open("config/config.json", "r"))
-    DATASETS = config.keys()
+    DATASETS = config["datasets"].keys()
     OCR_SYSTEMS = config["ocr-system"]
 
     parser = argparse.ArgumentParser(
@@ -19,7 +19,9 @@ def parse_args():
     parser.add_argument("--tasks", type=str, required=True, choices=["det", "rec"], help="tasks for the training data")
     parser.add_argument("--ocr-system", type=str, required=True, choices=OCR_SYSTEMS)
     parser.add_argument("--datasets", type=str, required=True, default=DATASETS, help="datasets that are going to be used to generate the training data")
-    parser.add_argument("--augmentation-file", type=str, required=False, help="json filename for blurring, skewing and distortion information")
+    parser.add_argument("--blur", dest="blur", action="store_true", help="add blurring to training data")
+    parser.add_argument("--skew", dest="skew", action="store_true", help="add skewing to training data")
+    parser.add_argument("--distort", dest="distort", action="store_true", help="add distortion to training data")
 
     args = parser.parse_args()
     return args
