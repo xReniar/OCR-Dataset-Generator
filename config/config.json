@@ -1,16 +1,20 @@
 {
     "datasets": {
         "funsd": "yes",
-        "iam_htr": "yes",
-        "iam_online": "yes",
+        "iam": {
+            "htr": "yes",
+            "online": "yes"
+        },
         "sroie": "yes",
-        "xfund_de": "yes",
-        "xfund_es": "yes",
-        "xfund_fr": "yes",
-        "xfund_it": "yes",
-        "xfund_ja": "yes",
-        "xfund_pt": "yes",
-        "xfund_zh": "yes"
+        "xfund": {
+            "de": "yes",
+            "es": "yes",
+            "fr": "yes",
+            "it": "yes",
+            "ja": "yes",
+            "pt": "yes",
+            "zh": "yes"
+        }
     },
     "ocr-system": [
         "doctr",
