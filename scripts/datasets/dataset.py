@@ -1,20 +1,32 @@
+from abc import ABC, abstractmethod
 import os
 import json
 
 
-class Dataset():
+class Dataset(ABC):
     def __init__(
         self,
         local_datasets: list,
-        online_datasets: list
+        online_datasets: dict,
+        images_link: str | None =  None
     ) -> None:
         self.local_datasets: list = local_datasets
-        self.online_datasets: list = online_datasets
+        self.online_datasets: dict = online_datasets
 
         self.download_annotations()
 
     def get_path(self, dataset: str | None = None) -> str:
-        datasets = self.local_datasets + self.online_datasets
+        '''
+        Get the path of the dataset
+
+        Args:
+            dataset (str): The name of the dataset
+        Returns:
+            Path of the dataset
+        '''
+        datasets = self.local_datasets + list(self.online_datasets.keys())
+        if self.get_class_name() in datasets:
+            datasets.remove(self.get_class_name())
         if (dataset == None and len(datasets) != 0):
             raise Exception(f"{self.get_class_name().upper()} dataset have more variants but none of them were specified")
         if (dataset != None and len(datasets) == 0):
@@ -41,7 +53,9 @@ class Dataset():
         Returns:
             bool: True if all the images are in the directory, False otherwise
         '''
-        datasets = self.local_datasets + self.online_datasets
+        datasets = self.local_datasets + list(self.online_datasets.keys())
+        if self.get_class_name() in datasets:
+            datasets.remove(self.get_class_name())
         if (dataset != None and len(datasets) == 0):
             raise Exception(f"no {dataset} exists for {self.get_class_name()}")
         
@@ -81,7 +95,9 @@ class Dataset():
         Returns:
             bool: True if the annotations folder exists, False otherwise.
         '''
-        datasets = self.local_datasets + self.online_datasets
+        datasets = self.local_datasets + list(self.online_datasets.keys())
+        if self.get_class_name() in datasets:
+            datasets.remove(self.get_class_name())
 
         assert (split in ["train", "test"]), f"split should be equal to 'train' or 'test', but equal to '{split}'"
         if (dataset != None and len(datasets) == 0):
@@ -94,3 +110,7 @@ class Dataset():
 
     def get_class_name(self) -> str:
         return self.__class__.__name__.lower()
+    
+    @abstractmethod
+    def download_images():
+        pass
