@@ -11,5 +11,8 @@ class IAM(Dataset):
             }
         )
 
-    def download_images(dataset:str | None = None):
-        pass
+    def download_images(self, dataset:str | None = None):
+        super().download_images(dataset)
+        link:str = self.online_datasets[dataset if dataset != None else self.get_class_name()]
+
+        # to 
