@@ -16,5 +16,5 @@ class XFUND(Dataset):
             }
         )
 
-    def download_images():
+    def download_images(dataset:str | None = None):
         pass
