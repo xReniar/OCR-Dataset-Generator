@@ -8,12 +8,11 @@ class Dataset(ABC):
         self,
         local_datasets: list,
         online_datasets: dict,
-        images_link: str | None =  None
     ) -> None:
         self.local_datasets: list = local_datasets
         self.online_datasets: dict = online_datasets
 
-        self.download_annotations()
+        #self.download_annotations()
 
     def get_path(self, dataset: str | None = None) -> str:
         '''
@@ -39,12 +38,7 @@ class Dataset(ABC):
             annotations = os.path.join(base_path)
         return annotations
 
-    def download_annotations(self) -> None:
-        '''
-        Download all the annotations specified in `datasets` if not `None`. 
-        '''
-
-    def check_images(self, dataset: str = None) -> bool:
+    def check_images(self, dataset: str | None = None) -> bool:
         '''
         Check if all the images specified in the `train` and `test` are available
 
@@ -111,6 +105,11 @@ class Dataset(ABC):
     def get_class_name(self) -> str:
         return self.__class__.__name__.lower()
     
+    def download_annotations(self, dataset:str | None = None) -> None:
+        '''
+        Download all the annotations specified in `datasets` if not `None`. 
+        '''
+    
     @abstractmethod
-    def download_images():
+    def download_images(self, dataset:str | None = None):
         pass
