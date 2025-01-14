@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from datasets import load_dataset
 import os
 import json
 
@@ -12,8 +13,6 @@ class Dataset(ABC):
         self.local_datasets: list = local_datasets
         self.online_datasets: dict = online_datasets
 
-        #self.download_annotations()
-
     def get_path(self, dataset: str | None = None) -> str:
         '''
         Get the path of the dataset
@@ -23,13 +22,7 @@ class Dataset(ABC):
         Returns:
             Path of the dataset
         '''
-        datasets = self.local_datasets + list(self.online_datasets.keys())
-        if self.get_class_name() in datasets:
-            datasets.remove(self.get_class_name())
-        if (dataset == None and len(datasets) != 0):
-            raise Exception(f"{self.get_class_name().upper()} dataset have more variants but none of them were specified")
-        if (dataset != None and len(datasets) == 0):
-            raise Exception(f"{self.get_class_name().upper()} dataset does not have {dataset} variant")
+        self.__check_parameters(dataset)
 
         base_path = os.path.join("../../data", self.get_class_name())
         if dataset != None:
@@ -47,11 +40,7 @@ class Dataset(ABC):
         Returns:
             bool: True if all the images are in the directory, False otherwise
         '''
-        datasets = self.local_datasets + list(self.online_datasets.keys())
-        if self.get_class_name() in datasets:
-            datasets.remove(self.get_class_name())
-        if (dataset != None and len(datasets) == 0):
-            raise Exception(f"no {dataset} exists for {self.get_class_name()}")
+        self.__check_parameters(dataset)
         
         train_path = self.get_path(dataset) + f"/train"
         test_path = self.get_path(dataset) + f"/test"
@@ -75,7 +64,6 @@ class Dataset(ABC):
                 break
 
         return train_check and test_check
-            
 
     def check_annotations(self, split: str, dataset: str | None = None) -> bool:
         '''
@@ -89,27 +77,38 @@ class Dataset(ABC):
         Returns:
             bool: True if the annotations folder exists, False otherwise.
         '''
-        datasets = self.local_datasets + list(self.online_datasets.keys())
-        if self.get_class_name() in datasets:
-            datasets.remove(self.get_class_name())
-
         assert (split in ["train", "test"]), f"split should be equal to 'train' or 'test', but equal to '{split}'"
-        if (dataset != None and len(datasets) == 0):
-            raise Exception(f"no {dataset} exists for {self.get_class_name()}")
+        self.__check_parameters(dataset)
 
         annotations = self.get_path(dataset) + f"/{split}"
 
         return os.path.isdir(annotations) and bool(os.listdir(annotations))
 
-
     def get_class_name(self) -> str:
         return self.__class__.__name__.lower()
     
+    def __check_parameters(self, dataset:str | None = None):
+        datasets = self.local_datasets + list(self.online_datasets.keys())
+        if self.get_class_name() in datasets:
+            datasets.remove(self.get_class_name())
+        if (dataset == None and len(datasets) != 0):
+            raise Exception(f"{self.get_class_name().upper()} dataset have more variants but none of them were specified")
+        if (dataset != None and len(datasets) == 0):
+            raise Exception(f"{self.get_class_name().upper()} dataset does not have '{dataset}' variant")
+    
     def download_annotations(self, dataset:str | None = None) -> None:
         '''
-        Download all the annotations specified in `datasets` if not `None`. 
+        Download all the annotations specified in `datasets`.
+        If `dataset` is `None` it means the dataset does not have variants 
+
+        Args:
+            dataset (str): The name of the dataset
         '''
+        self.__check_parameters(dataset)
+        for split in ["train", "test"]:
+            ds = None
+
     
     @abstractmethod
     def download_images(self, dataset:str | None = None):
-        pass
+        self.__check_parameters(dataset)
