@@ -16,7 +16,7 @@ def parse_args():
     )
 
     parser.add_argument("--name", type=str, required=True, default="custom_data", help="name of the training data")
-    parser.add_argument("--tasks", type=str, required=True, choices=["det", "rec"], help="tasks for the training data")
+    parser.add_argument("--task", type=str, required=True, choices=["det", "rec"], help="task for the training data")
     parser.add_argument("--ocr-system", type=str, required=True, choices=OCR_SYSTEMS)
     parser.add_argument("--datasets", type=str, required=True, default=DATASETS, help="datasets that are going to be used to generate the training data")
     parser.add_argument("--blur", dest="blur", action="store_true", help="add blurring to training data")
