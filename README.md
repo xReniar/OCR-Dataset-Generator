@@ -1,5 +1,5 @@
 # OCR dataset generator
-Training data generator for Text Detection and Text Recognition. The training data will be generated following the format specified by the various supported OCR systems. The supposted OCR systems are:
+Training data generator for Text Detection and Text Recognition. The training data will be generated following the format specified by the various supported OCR systems. The supported OCR systems are:
 
 <p align="center">
     <a href="https://github.com/mindee/doctr">
