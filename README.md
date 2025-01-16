@@ -18,6 +18,13 @@ At the moment the datasets that can be used to generate the training data are:
 - `IAM`: https://fki.tic.heia-fr.ch/databases/iam-handwriting-database
 - `SROIE`: https://paperswithcode.com/paper/icdar2019-competition-on-scanned-receipt-ocr
 - `XFUND`: https://github.com/doc-analysis/XFUND (`de`,`es`,`fr`,`it`,`ja`,`pt`,`zh`)
+
+| Dataset | Annotations | Images |
+| ---         |     ---      |          --- |
+| `FUNSD` |    available    |   available    |
+| `IAM` |   available   |  not available   |
+| `SROIE` |   available   |  not available   |
+| `XFUND` |    available    |   available    |
 # Generate training data
 To generate the training data just execute:
 ```bash
@@ -30,20 +37,20 @@ Inside the `data` folder, there are folders for every dataset specified in the `
 .
 └── data
     ├── dataset-A -----------> # type-1 
-    │   ├── images
-    │   ├── test
-    │   └── train
+    │   ├── images
+    │   ├── test
+    │   └── train
     ├── dataset-B -----------> # type-2
     │   ├── sub-dataset-1 ---> # variant-1 of dataset B
-    │   │   ├── images
-    │   │   ├── test
-    │   │   └── train
+    │   │   ├── images
+    │   │   ├── test
+    │   │   └── train
     │   └── sub-dataset-2 ---> # variant-2 of dataset B
     │       ├── images
     │       ├── test
     │       └── train
     └── ....
-``` 
+```
 To understand how to add new datasets, it is necessary to distinguish between two categories of datasets.
 - `type-1`: this type of dataset does not have a variant for example `IAM` and `SROIE`
 - `type-2`: this type of dataset have multiple version, for example `XFUND` have more languages 
@@ -65,12 +72,13 @@ To add a new dataset, create a folder with the name of the dataset, this folder 
     ├── img1.txt # label for img1
     └── ...
 ```
+### Dataset format
 Save `word` and `bbox` separated by `\t`:
 - `bbox` is a `list` containing 4 coordinates: `[x,y,X,Y]`, where `(x,y)` are the top-left coordinates and `(X,Y)` are the bottom-right coordinates.
 ```py
 file.write(f"{word}\t{bbox}\n") # example on how to create .txt files
 ```
-After this create, inside `./scripts/dataset/` a `{DatasetName}`.py, and copy this:
+After this create, inside `./scripts/dataset/` a `{DatasetName}.py`, and copy this:
 ```py
 from dataset import Dataset
 
@@ -86,6 +94,8 @@ class DatasetName(Dataset): # change name of the class with the dataset name
 ```
 ## Add new Dataset (with variant)
 Do this if you want to add a new dataset with more variants or if you want to add more variants for a dataset that already have variants. If the dataset you want to add have multiple variants like `XFUND` create a main folder with inside every `variants` containing `image`, `train` and `test` folder.
+
+This example is when there is already an existing dataset and you just want to add a new variant of that dataset:
 ```py
 # Case with existing dataset that already have variants
 from dataset import Dataset
@@ -105,7 +115,8 @@ class ExistingDataset(Dataset): # change name of the class with the dataset name
     def download(self, dataset:str | None = None): 
         pass
 ```
-In this case if your dataset is online you can add the `variant` in the `online_datasets` with the download link and implement the `download` function, if it's just a local dataset put it in `local_datasets`
+
+This example is when you're dataset is local:
 ```py
 # Case with new dataset
 from dataset import Dataset
@@ -123,3 +134,5 @@ class NewDataset(Dataset): # change name of the class with the dataset name
     def download(self, dataset:str | None = None):
         pass
 ```
+
+In both cases follow the `format` explained [here](#dataset-format)
