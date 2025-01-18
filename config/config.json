@@ -1,10 +1,7 @@
 {
     "datasets": {
         "funsd": "yes",
-        "iam": {
-            "htr": "yes",
-            "online": "yes"
-        },
+        "iam": "yes",
         "sroie": "yes",
         "xfund": {
             "de": "yes",
