@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from datasets import load_dataset
 import os
-import json
 
 
 class Dataset(ABC):
@@ -47,7 +46,7 @@ class Dataset(ABC):
         img_folder_path = self.get_path(dataset) + f"/images"
         img_folder = os.listdir(img_folder_path)
 
-        train_check: bool = False
+        train_check: bool = True
         for annotation in os.listdir(train_path):
             img_name = annotation.split(".")[0]
             img_exists = any(fname.startswith(img_name) for fname in img_folder)
@@ -55,7 +54,7 @@ class Dataset(ABC):
             if not(train_check):
                 break
 
-        test_check: bool = False
+        test_check: bool = True
         for annotation in os.listdir(test_path):
             img_name = annotation.split(".")[0]
             img_exists = any(fname.startswith(img_name) for fname in img_folder)
@@ -94,21 +93,24 @@ class Dataset(ABC):
         if (dataset == None and len(datasets) != 0):
             raise Exception(f"{self.get_class_name().upper()} dataset have more variants but none of them were specified")
         if (dataset != None and len(datasets) == 0):
+            raise Exception(f"{self.get_class_name().upper()} wrong parameter passed")
+        if dataset != None and dataset not in datasets:
             raise Exception(f"{self.get_class_name().upper()} dataset does not have '{dataset}' variant")
-    
-    def download_annotations(self, dataset:str | None = None) -> None:
+
+    @abstractmethod
+    def download_data(self, dataset: str | None = None) -> None:
         '''
-        Download all the annotations specified in `datasets`.
-        If `dataset` is `None` it means the dataset does not have variants 
+        Download images and annotations for `dataset`
 
         Args:
             dataset (str): The name of the dataset
         '''
         self.__check_parameters(dataset)
-        for split in ["train", "test"]:
-            ds = None
 
-    
-    @abstractmethod
-    def download_images(self, dataset:str | None = None):
-        self.__check_parameters(dataset)
+        if dataset in self.online_datasets.keys():
+            self._current_link:str = self.online_datasets[dataset if dataset != None else self.get_class_name()]
+
+        os.makedirs(self.get_path(dataset), exist_ok=True)
+        os.makedirs(f"{self.get_path(dataset)}/train", exist_ok=True)
+        os.makedirs(f"{self.get_path(dataset)}/test", exist_ok=True)
+        os.makedirs(f"{self.get_path(dataset)}/images", exist_ok=True)
