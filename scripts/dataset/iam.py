@@ -1,4 +1,5 @@
 from dataset import Dataset
+from datasets import load_dataset
 
 
 class IAM(Dataset):
@@ -6,13 +7,9 @@ class IAM(Dataset):
         super().__init__(
             local_datasets = [],
             online_datasets = {
-                "htr": "",
-                "online": ""
+                "iam": "hf url"
             }
         )
 
-    def download_images(self, dataset:str | None = None):
-        super().download_images(dataset)
-        link:str = self.online_datasets[dataset if dataset != None else self.get_class_name()]
-
-        # to 
+    def download_data(self, dataset:str | None = None) -> None:
+        super().download_data(dataset)
