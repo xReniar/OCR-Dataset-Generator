@@ -1,116 +1,68 @@
 from abc import ABC, abstractmethod
-from datasets import load_dataset
 import os
-
 
 class Dataset(ABC):
     def __init__(
         self,
-        local_datasets: list,
-        online_datasets: dict,
+        config:dict
     ) -> None:
-        self.local_datasets: list = local_datasets
-        self.online_datasets: dict = online_datasets
+        super().__init__()
+        self.config:dict = config
 
-    def get_path(self, dataset: str | None = None) -> str:
-        '''
-        Get the path of the dataset
-
-        Args:
-            dataset (str): The name of the dataset
-        Returns:
-            Path of the dataset
-        '''
-        self.__check_parameters(dataset)
-
-        base_path = os.path.join("../../data", self.get_class_name())
-        if dataset != None:
-            annotations = os.path.join(base_path, dataset)
+        # to manage multiple sub datasets
+        self.sub_datasets:list = []
+        if not(len(self.config.keys()) == 1 and self.__root_name() in self.config.keys() or len(self.config.keys()) == 0):
+            self.sub_datasets = list(self.config.keys())
+            self._current = self.sub_datasets[0]
         else:
-            annotations = os.path.join(base_path)
-        return annotations
+            self._current = self.__root_name()
 
-    def check_images(self, dataset: str | None = None) -> bool:
-        '''
-        Check if all the images specified in the `train` and `test` are available
-
-        Args:
-            dataset (str): The name of the dataset
-        Returns:
-            bool: True if all the images are in the directory, False otherwise
-        '''
-        self.__check_parameters(dataset)
+        #self.mode = "online" if len(config.keys()) > 0 else "local"
         
-        train_path = self.get_path(dataset) + f"/train"
-        test_path = self.get_path(dataset) + f"/test"
-        img_folder_path = self.get_path(dataset) + f"/images"
-        img_folder = os.listdir(img_folder_path)
 
-        train_check: bool = True
-        for annotation in os.listdir(train_path):
-            img_name = annotation.split(".")[0]
-            img_exists = any(fname.startswith(img_name) for fname in img_folder)
-            train_check = train_check and img_exists
-            if not(train_check):
-                break
-
-        test_check: bool = True
-        for annotation in os.listdir(test_path):
-            img_name = annotation.split(".")[0]
-            img_exists = any(fname.startswith(img_name) for fname in img_folder)
-            test_check = test_check and img_exists
-            if not(test_check):
-                break
-
-        return train_check and test_check
-
-    def check_annotations(self, split: str, dataset: str | None = None) -> bool:
+    def __root_name(self) -> str:
         '''
-        Check if the annotations folder for the given `dataset` and `split` exists.
-        Also checks if the folder is not empty
-
-        Args:
-            dataset (str): The name of the dataset.
-            split (str): The name of the split (e.g., "train", "test").
-
-        Returns:
-            bool: True if the annotations folder exists, False otherwise.
+        Returns root name of the dataset
         '''
-        assert (split in ["train", "test"]), f"split should be equal to 'train' or 'test', but equal to '{split}'"
-        self.__check_parameters(dataset)
-
-        annotations = self.get_path(dataset) + f"/{split}"
-
-        return os.path.isdir(annotations) and bool(os.listdir(annotations))
-
-    def get_class_name(self) -> str:
         return self.__class__.__name__.lower()
     
-    def __check_parameters(self, dataset:str | None = None):
-        datasets = self.local_datasets + list(self.online_datasets.keys())
-        if self.get_class_name() in datasets:
-            datasets.remove(self.get_class_name())
-        if (dataset == None and len(datasets) != 0):
-            raise Exception(f"{self.get_class_name().upper()} dataset have more variants but none of them were specified")
-        if (dataset != None and len(datasets) == 0):
-            raise Exception(f"{self.get_class_name().upper()} wrong parameter passed")
-        if dataset != None and dataset not in datasets:
-            raise Exception(f"{self.get_class_name().upper()} dataset does not have '{dataset}' variant")
+    def set_to(
+        self,
+        sub_dataset:str
+    ) -> None:
+        '''
+        Set the current dataset to `sub_dataset` if the dataset has sub-datasets
+        If not raises a value error
+        '''
+        if sub_dataset in self.config.keys():
+            self._current = sub_dataset
+        else:
+            raise ValueError(f"Dataset {self.__root_name().upper()} does not have {sub_dataset} sub-dataset")
+
+    def path(self) -> str:
+        '''
+        Return the path of the directory where images and labels are stored
+        '''
+        base_path = os.path.join("../../data", self.__root_name())
+        if len(self.sub_datasets) != 0:
+            base_path = os.path.join(base_path, self._current)
+
+        return base_path
+
+    def load_data(
+        self
+    ) -> None:
+        pass
 
     @abstractmethod
-    def download_data(self, dataset: str | None = None) -> None:
+    def _download(
+        self
+    ) -> None:
         '''
-        Download images and annotations for `dataset`
-
-        Args:
-            dataset (str): The name of the dataset
+        Download images and labels for `current` dataset
         '''
-        self.__check_parameters(dataset)
 
-        if dataset in self.online_datasets.keys():
-            self._current_link:str = self.online_datasets[dataset if dataset != None else self.get_class_name()]
-
-        os.makedirs(self.get_path(dataset), exist_ok=True)
-        os.makedirs(f"{self.get_path(dataset)}/train", exist_ok=True)
-        os.makedirs(f"{self.get_path(dataset)}/test", exist_ok=True)
-        os.makedirs(f"{self.get_path(dataset)}/images", exist_ok=True)
+        os.makedirs(self.path(), exist_ok=True)
+        os.makedirs(f"{self.path()}/train", exist_ok=True)
+        os.makedirs(f"{self.path()}/test", exist_ok=True)
+        os.makedirs(f"{self.path()}/images", exist_ok=True)
