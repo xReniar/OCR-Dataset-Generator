@@ -16,8 +16,8 @@ class SROIE(Dataset):
     ) -> None:
         super().__init__(config)
 
-    def _download(self):
-        super()._download()
+    def download(self):
+        super().download()
 
         for split in ["train", "test"]:
             for sample in load_dataset(CONFIG[self._current][1], split=split):
