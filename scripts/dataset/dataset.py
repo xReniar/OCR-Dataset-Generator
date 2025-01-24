@@ -1,5 +1,8 @@
 from abc import ABC, abstractmethod
+from PIL import Image, ImageDraw
 import os
+import ast
+
 
 class Dataset(ABC):
     def __init__(
@@ -75,6 +78,32 @@ class Dataset(ABC):
     def __rec_loader(self, split:str):
         for file in os.listdir(f"{self.path()}/{split}"):
             pass
+
+    def draw_labels(self):
+        os.makedirs(os.path.join(self.path(),"draw"), exist_ok=True)
+        imgs_dir = os.listdir(f"{self.path()}/images")
+
+        for split in ["train", "test"]:
+            os.makedirs(os.path.join(self.path(),"draw", split), exist_ok=True)
+            for file in os.listdir(os.path.join(self.path(),split)):
+                file_path = os.path.join(self.path(), split, file)
+
+                bbox_list = []
+                with open(file_path, "r") as label:
+                    for row in label.readlines():
+                        _, bbox = row.split("\t")
+                        bbox_list.append(ast.literal_eval(bbox))
+                
+                img_name = file_path.split("/")[-1].replace("txt","")
+                extension= [f for f in imgs_dir if f.startswith(img_name)][0].split(".")[1]
+                
+
+                img = Image.open(f"{self.path()}/images/{img_name}{extension}")
+                draw = ImageDraw.Draw(img)
+                for bbox in bbox_list:
+                    draw.rectangle(bbox, outline="black")
+                img.save(f"{self.path()}/draw/{split}/{img_name}{extension}")
+
 
     @abstractmethod
     def download(
