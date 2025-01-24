@@ -1,15 +1,19 @@
 from dataset import Dataset
-from datasets import load_dataset
+
+CONFIG = {
+    "iam": [
+        "",
+        ""
+    ]
+}
 
 
 class IAM(Dataset):
-    def __init__(self):
-        super().__init__(
-            local_datasets = [],
-            online_datasets = {
-                "iam": "hf url"
-            }
-        )
+    def __init__(
+        self,
+        config: dict
+    ) -> None:
+        super().__init__(config)
 
-    def download_data(self, dataset:str | None = None) -> None:
-        super().download_data(dataset)
+    def _download(self):
+        super()._download()
