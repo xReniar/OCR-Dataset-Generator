@@ -17,8 +17,8 @@ class FUNSD(Dataset):
     ) -> None:
         super().__init__(config)
 
-    def _download(self):
-        super()._download()
+    def download(self):
+        super().download()
 
         response = requests.get(CONFIG[self._current])
         zip_fn = CONFIG[self._current].split("/")[-1]
