@@ -50,7 +50,8 @@ class Dataset(ABC):
         return base_path
 
     def load_data(
-        self
+        self,
+        task: str
     ) -> None:
         pass
 
@@ -62,7 +63,9 @@ class Dataset(ABC):
         Download images and labels for `current` dataset
         '''
 
-        os.makedirs(self.path(), exist_ok=True)
-        os.makedirs(f"{self.path()}/train", exist_ok=True)
-        os.makedirs(f"{self.path()}/test", exist_ok=True)
-        os.makedirs(f"{self.path()}/images", exist_ok=True)
+        path = self.path()
+
+        os.makedirs(path, exist_ok=True)
+        os.makedirs(f"{path}/train", exist_ok=True)
+        os.makedirs(f"{path}/test", exist_ok=True)
+        os.makedirs(f"{path}/images", exist_ok=True)
