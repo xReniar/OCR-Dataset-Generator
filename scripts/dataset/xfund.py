@@ -23,8 +23,8 @@ class XFUND(Dataset):
     ) -> None:
         super().__init__(config)
 
-    def _download(self):
-        super()._download()
+    def download(self):
+        super().download()
 
         # download and extraction of annotations
         for split in ["train", "val"]:
