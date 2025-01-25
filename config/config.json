@@ -1,21 +1,19 @@
 {
+    "test-name": "custom",
+    "ocr-system": "doctr",
+    "tasks": ["det", "rec"],
     "datasets": {
-        "funsd": "yes",
-        "iam": "yes",
-        "sroie": "yes",
+        "funsd": "y",
+        "iam": "n",
+        "sroie": "n",
         "xfund": {
-            "de": "yes",
-            "es": "yes",
-            "fr": "yes",
-            "it": "yes",
-            "ja": "yes",
-            "pt": "yes",
-            "zh": "yes"
+            "xfund-de": "y",
+            "xfund-es": "n",
+            "xfund-fr": "n",
+            "xfund-it": "n",
+            "xfund-ja": "n",
+            "xfund-pt": "y",
+            "xfund-zh": "n"
         }
-    },
-    "ocr-system": [
-        "doctr",
-        "mmocr",
-        "paddleocr"
-    ]
+    }
 }
