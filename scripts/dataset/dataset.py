@@ -64,7 +64,10 @@ class Dataset(ABC):
         if task == "rec":
             return self.__rec_loader(split)
 
-    def __det_loader(self, split:str):
+    def __det_loader(
+        self,
+        split: str
+    ):
         base_path = f"{self.path()}/{split}"
 
         loader = []
@@ -79,7 +82,11 @@ class Dataset(ABC):
         for file in os.listdir(f"{self.path()}/{split}"):
             pass
 
-    def draw_labels(self):
+    def draw_labels(self,
+        outline: str = "black",
+        fill: str | None = None,
+        width: int = 1
+    ) -> None:
         os.makedirs(os.path.join(self.path(),"draw"), exist_ok=True)
         imgs_dir = os.listdir(f"{self.path()}/images")
 
@@ -101,7 +108,7 @@ class Dataset(ABC):
                 img = Image.open(f"{self.path()}/images/{img_name}{extension}")
                 draw = ImageDraw.Draw(img)
                 for bbox in bbox_list:
-                    draw.rectangle(bbox, outline="black")
+                    draw.rectangle(bbox, fill, outline, width)
                 img.save(f"{self.path()}/draw/{split}/{img_name}{extension}")
 
 
