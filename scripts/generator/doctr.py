@@ -2,18 +2,26 @@ from generator import Generator
 
 
 class DoctrGenerator(Generator):
-    def __init__(self,
-        datasets: tuple,
-        task: str,
-        output_name: str
+    def __init__(
+        self,
+        datasets:list,
+        transforms = None
     ) -> None:
         super().__init__(
-
+            datasets,
+            transforms
         )
 
-    def det_generator(self, dataset:str) -> None:
-        return super().det_generator()
-    
-    def rec_generator(self, dataset:str) -> None:
-        return super().rec_generator()
-    
+    def generate_det_data(self):
+        super().generate_det_data()
+
+        for dataset in self.datasets:
+            print(dataset)
+
+    def generate_rec_data(self):
+        super().generate_rec_data()    
+
+
+x = DoctrGenerator(["funsd", "xfund-de"])
+
+x.generate_det_data()
