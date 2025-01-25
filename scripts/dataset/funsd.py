@@ -1,4 +1,4 @@
-from dataset import Dataset
+from .dataset import Dataset
 import requests
 import zipfile
 import shutil
@@ -20,8 +20,8 @@ class FUNSD(Dataset):
     def download(self):
         super().download()
 
-        response = requests.get(CONFIG[self._current])
-        zip_fn = CONFIG[self._current].split("/")[-1]
+        response = requests.get(self.config[self._current])
+        zip_fn = self.config[self._current].split("/")[-1]
         with open(f"{self.path()}/{zip_fn}","wb") as f:
             f.write(response.content)
 

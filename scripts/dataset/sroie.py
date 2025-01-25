@@ -1,4 +1,4 @@
-from dataset import Dataset
+from .dataset import Dataset
 from datasets import load_dataset
 
 CONFIG = {
@@ -20,7 +20,7 @@ class SROIE(Dataset):
         super().download()
 
         for split in ["train", "test"]:
-            for sample in load_dataset(CONFIG[self._current][1], split=split):
+            for sample in load_dataset(self.config[self._current][1], split=split):
                 words = sample["words"]
                 bboxes = sample["bboxes"]
                 #ner_tags = sample["ner_tags"]

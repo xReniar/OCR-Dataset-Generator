@@ -1,4 +1,4 @@
-from dataset import Dataset
+from .dataset import Dataset
 import requests
 import zipfile
 import os
@@ -29,7 +29,7 @@ class XFUND(Dataset):
         # download and extraction of annotations
         for split in ["train", "val"]:
             folder = "train" if split == "train" else "test"
-            annotation = requests.get(f"{CONFIG[self._current]}{split}.json", allow_redirects=True).json()
+            annotation = requests.get(f"{self.config[self._current]}{split}.json", allow_redirects=True).json()
             documents:list = annotation["documents"]
             
             for element in documents:
@@ -47,8 +47,8 @@ class XFUND(Dataset):
         # download images
         for split in ["train", "val"]:
             folder = "train" if split == "train" else "test"
-            response = requests.get(f"{CONFIG[self._current]}{split}.zip")
-            zip_fn = CONFIG[self._current].split("/")[-1]
+            response = requests.get(f"{self.config[self._current]}{split}.zip")
+            zip_fn = self.config[self._current].split("/")[-1]
             current_path = f"{self.path()}/{zip_fn}{split}.zip"
             with open(current_path,"wb") as f:
                 f.write(response.content)
