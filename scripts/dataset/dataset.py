@@ -14,16 +14,16 @@ class Dataset(ABC):
 
         # to manage multiple sub datasets
         self.sub_datasets:list = []
-        if not(len(self.config.keys()) == 1 and self.__root_name() in self.config.keys() or len(self.config.keys()) == 0):
+        if not(len(self.config.keys()) == 1 and self._root_name() in self.config.keys() or len(self.config.keys()) == 0):
             self.sub_datasets = list(self.config.keys())
             self._current = self.sub_datasets[0]
         else:
-            self._current = self.__root_name()
+            self._current = self._root_name()
 
         #self.mode = "online" if len(config.keys()) > 0 else "local"
         
 
-    def __root_name(self) -> str:
+    def _root_name(self) -> str:
         '''
         Returns root name of the dataset
         '''
@@ -40,13 +40,13 @@ class Dataset(ABC):
         if sub_dataset in self.config.keys():
             self._current = sub_dataset
         else:
-            raise ValueError(f"Dataset {self.__root_name().upper()} does not have {sub_dataset} sub-dataset")
+            raise ValueError(f"Dataset {self._root_name().upper()} does not have {sub_dataset} sub-dataset")
 
     def path(self) -> str:
         '''
         Return the path of the directory where images and labels are stored
         '''
-        base_path = os.path.join("../../data", self.__root_name())
+        base_path = os.path.join("data", self._root_name())
         if len(self.sub_datasets) != 0:
             base_path = os.path.join(base_path, self._current)
 
@@ -72,7 +72,7 @@ class Dataset(ABC):
                         bbox_list.append(ast.literal_eval(bbox))
                 
                 img_name = file_path.split("/")[-1].replace("txt","")
-                extension= [f for f in imgs_dir if f.startswith(img_name)][0].split(".")[1]
+                extension = [f for f in imgs_dir if f.startswith(img_name)][0].split(".")[1]
                 
 
                 img = Image.open(f"{self.path()}/images/{img_name}{extension}")
@@ -81,6 +81,26 @@ class Dataset(ABC):
                     draw.rectangle(bbox, fill, outline, width)
                 img.save(f"{self.path()}/draw/{split}/{img_name}{extension}")
 
+    def is_downloaded(
+        self
+    ) -> bool:
+        if os.path.exists(self.path()):
+            print(f"{self._current} already downloaded")
+            return True
+        else:
+            print(f"Downloading {self._current}")
+            return False
+    
+    def has_variants(
+        self
+    ) -> bool:
+        keys = list(self.config.keys())
+        if len(keys) == 0:
+            return False
+        if self._root_name() in keys:
+            return False
+        else:
+            return True
 
     @abstractmethod
     def download(
