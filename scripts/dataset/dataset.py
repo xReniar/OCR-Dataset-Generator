@@ -52,36 +52,6 @@ class Dataset(ABC):
 
         return base_path
 
-    def load_data(
-        self,
-        task: str,
-        split: str
-    ) -> None:
-        assert split in ["train", "test"], f"No split of type: {split}"
-
-        if task == "det":
-            return self.__det_loader(split)
-        if task == "rec":
-            return self.__rec_loader(split)
-
-    def __det_loader(
-        self,
-        split: str
-    ):
-        base_path = f"{self.path()}/{split}"
-
-        loader = []
-        for file in os.listdir(base_path):
-            labels = open(f"{base_path}/{file}","r")
-            for label in labels.readlines():
-                row = label.replace("\n","").split("\t")
-                print(row)
-            labels.close()
-
-    def __rec_loader(self, split:str):
-        for file in os.listdir(f"{self.path()}/{split}"):
-            pass
-
     def draw_labels(self,
         outline: str = "black",
         fill: str | None = None,
