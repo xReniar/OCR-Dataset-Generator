@@ -1,3 +1,4 @@
+from scripts.dataset.dataset import Dataset
 import os
 import importlib
 
@@ -21,4 +22,4 @@ for dataset_file in dataset_files:
     if hasattr(module, "CONFIG"):
         CONFIG[class_name] = getattr(module, "CONFIG")
 
-__all__ = ["DATASETS", "CONFIG"]
+__all__ = ["DATASETS", "CONFIG", "Dataset"]
