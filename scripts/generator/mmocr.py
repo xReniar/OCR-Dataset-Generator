@@ -3,16 +3,14 @@ from generator import Generator
 
 class MMOCRGenerator(Generator):
     def __init__(self,
-        datasets: tuple,
-        task: str,
-        output_name: str
+        transforms
     ) -> None:
         super().__init__(
-            
+            transforms
         )
 
-    def det_generator(self, dataset:str) -> None:
-        return super().det_generator()
-    
-    def rec_generator(self, dataset:str) -> None:
-        return super().rec_generator()
+    def generate_det_data(self):
+        super().generate_det_data()
+
+    def generate_rec_data(self):
+        super().generate_rec_data()
