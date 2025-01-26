@@ -1,11 +1,16 @@
-from generator import Generator
+from .generator import Generator
 
 
 class MMOCRGenerator(Generator):
-    def __init__(self,
-        transforms
+    def __init__(
+        self,
+        test_name: str,
+        datasets: list,
+        transforms = None
     ) -> None:
         super().__init__(
+            test_name,
+            datasets,
             transforms
         )
 
