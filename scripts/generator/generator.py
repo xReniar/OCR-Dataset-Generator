@@ -49,10 +49,8 @@ class Generator(ABC):
         args = []                
         # image creation
         for label in label_dir:
-            img_name = label.replace(".txt","")
-            extension = extension_map[img_name]
-
-            img_name = f"{img_name}.{extension}"
+            img_name = extension_map[label]
+            
             src = f"{src_path}/images/{img_name}" 
             dst = f"{dst_path}/{img_name}"
             args.append((src, dst))
