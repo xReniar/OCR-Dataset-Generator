@@ -1,49 +1,39 @@
 from scripts.dataset import *
+from scripts.generator import *
 import json
 
-__OCR_SYSTEMS__ = ["doctr", "mmocr", "paddleocr"]
 
-def download_data(
-    requested_datasets: list[Dataset],
-    sub_datasets: dict
-) -> None:
-    for dataset in requested_datasets:
-        if dataset.has_variants():
-            for sub in sub_datasets[dataset._root_name()]:
-                dataset.set_to(sub)
-                if not(dataset.is_downloaded()):
-                    dataset.download()
-        else:
-            if not(dataset.is_downloaded()):
-                    dataset.download()
-
-def main(
-    test_name: str, 
+def generate(
+    test_name: str,
     ocr_system: str,
-    task: list,
-    datasets
+    tasks: list,
+    datasets: dict
 ) -> None:
-    # get root datasets (without the '-' after every name)
-    main_datasets = set()
-    sub_datasets = dict()
-    for dataset in datasets:
-        if isinstance(dataset, str):
-            main_datasets.add(dataset)
-        if isinstance(dataset, list):
-            root, _ = dataset[0].split("-")
-            sub_datasets[root] = dataset
-            main_datasets.add(root)
-    main_datasets: list[str] = list(main_datasets)
+    
+    # create dataset objects
+    for dataset in datasets.keys():
+        if "-" in dataset:
+            root:str = dataset.split("-")[0].upper()
+            dataset_instance:Dataset = DATASETS[root](CONFIG[root])
+            dataset_instance.set_to(dataset)
+            datasets[dataset] = dataset_instance
+        else:
+            datasets[dataset] = DATASETS[dataset.upper()](CONFIG[dataset.upper()])
 
-    # generating instances of datasets (Dataset object)
-    requested_datasets:list[Dataset] = []
-    for dataset in main_datasets:
-        name_upper = dataset.upper()
-        requested_datasets.append(DATASETS[name_upper](CONFIG[name_upper]))
+    # download if necessary
+    for dataset in datasets.keys():
+        dataset_instance: Dataset = datasets[dataset]
+        if not(dataset_instance.is_downloaded()):
+            dataset_instance.download()
 
-    # download data if necessary
-    download_data(requested_datasets, sub_datasets)
+    ocr_generator: Generator = OCR_SYSTEMS[ocr_system](test_name,list(datasets.keys()))
 
+    for task in tasks:
+        if task == "det":
+            ocr_generator.generate_det_data()
+        if task == "rec":
+            ocr_generator.generate_rec_data()
+    
 
 if __name__ == "__main__":
     config:dict = json.load(open("config/config.json", "r"))
@@ -56,23 +46,22 @@ if __name__ == "__main__":
     if len(defined_classes) < len(config_classes):
         raise BaseException("Some datasets in the `config.json` do not have a script in `./scripts/dataset/`")
 
-    selected = []
+    selected_datasets = {}
     for dataset in list(datasets.keys()):
         value = datasets[dataset]
         if isinstance(value, str):
-            selected.append(dataset) if value == "y" else None
+            if value == "y":
+                selected_datasets[dataset] = None
         elif isinstance(value, dict):
-            sub_list = []
             for sub in value.keys():
-                sub_list.append(sub) if value[sub] == "y" else None
-            selected.append(sub_list) if len(sub_list) > 0 else None
+                if value[sub] == "y":
+                    selected_datasets[sub] = None
         else:
             raise ValueError(f"Type '{type(value)}' not available")
-        
-    main(
+    
+    generate(
         config["test-name"],
         config["ocr-system"],
-        config["task"],
-        selected
+        config["tasks"],
+        selected_datasets
     )
-    
