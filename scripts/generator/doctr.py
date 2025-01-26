@@ -1,4 +1,4 @@
-from generator import Generator
+from .generator import Generator
 from PIL import Image
 import hashlib
 import json
@@ -8,10 +8,12 @@ import os
 class DoctrGenerator(Generator):
     def __init__(
         self,
-        datasets:list,
+        test_name: str,
+        datasets: list,
         transforms = None
     ) -> None:
         super().__init__(
+            test_name,
             datasets,
             transforms
         )
@@ -21,27 +23,20 @@ class DoctrGenerator(Generator):
 
         for split in ["train", "test"]:
             labels = {}
+            os.makedirs(f"{self._root_path}/{split}/images", exist_ok=True)
             for dataset in self.datasets:
-                current_path = f"../../data/{dataset}"
+                current_path = f"data/{dataset}"
 
-                imgs_dir = os.listdir(f"{current_path}/images")
-                imgs_dir.sort()
-
-                extension_map = {}
-                for img in imgs_dir:
-                    name, _ = img.split(".")
-                    extension_map[f"{name}.txt"] = img
-
-                os.makedirs(f"../../output/doctr-det/{split}/images", exist_ok=True)
-                label_dir = os.listdir(f"{current_path}/{split}")
-                label_dir.sort()
+                imgs_dir = sorted(os.listdir(f"{current_path}/images"))
+                extension_map = self.extension_map(imgs_dir)
+                label_dir = sorted(os.listdir(f"{current_path}/{split}"))
 
                 # images creations
                 self.copy_file(
                     label_dir,
                     extension_map,
                     current_path,
-                    f"../../output/{self.name()}-det/{split}/images",
+                    f"{self._root_path}/{split}/images",
                 )
 
                 # labels creation
@@ -62,7 +57,7 @@ class DoctrGenerator(Generator):
                         polygons = polygons
                     )
                     img.close()
-            with open(f"../../output/doctr-det/{split}/labels.json","w") as file:
+            with open(f"{self._root_path}/{split}/labels.json","w") as file:
                 json.dump(labels,file, indent=4)
 
 
@@ -70,12 +65,23 @@ class DoctrGenerator(Generator):
         super().generate_rec_data()
 
         for split in ["train", "test"]:
+            labels = {}
+            os.makedirs(f"{self._root_path}/{split}/images", exist_ok=True)
             for dataset in self.datasets:
-                current_path = f"../../data/{dataset}"
+                current_path = f"data/{dataset}"
 
-                imgs_dir = os.listdir(f"{current_path}/images")
-                imgs_dir.sort()
+                imgs_dir = sorted(os.listdir(f"{current_path}/images"))
+                extension_map = self.extension_map(imgs_dir)
 
-                os.makedirs(f"../../output/doctr-rec/{split}/images", exist_ok=True)
-                label_dir = os.listdir(f"{current_path}/{split}")
-                label_dir.sort()
+                for label in sorted(os.listdir(f"{current_path}/{split}")):
+                    text_file = open(f"{current_path}/{split}/{label}")
+                    img = Image.open(f"{current_path}/images/{extension_map[label]}")
+                    for index, (text, bbox) in enumerate(self.read_rows(text_file)):
+                        crop_name = extension_map[label].replace(".",f"-{index}.")
+                        img.crop(bbox).save(f"{self._root_path}/{split}/images/{crop_name}")
+                        labels[crop_name] = text
+                    img.close()
+                    text_file.close()
+
+            with open(f"{self._root_path}/{split}/labels.json","w") as file:
+                json.dump(labels,file, indent=4)
