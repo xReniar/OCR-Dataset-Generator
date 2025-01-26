@@ -1,5 +1,5 @@
-# Dataset
-Inside the `data` folder, there are folders for every dataset specified in the `config.json`. Below is shown the structure of the `data` folder:
+# Data folder structure
+Inside the `data` folder, are stored every downloaded dataset specified in the `config.json`.  Below is shown the structure of the `data` folder:
 ```bash
 .
 └── data
@@ -44,42 +44,54 @@ These `.txt` files contains for every `word` the `bounding-box` associated, in t
 ```py
 file.write(f"{word}\t{bbox}\n") # example on how to create .txt files
 ```
-The `.txt` file should look something like this
+The `.txt` file should look something like this:
 ```txt
 This [x1,y1,x2,y2]
 is [x1,y1,x2,y2]
 an [x1,y1,x2,y2]
 example [x1,y1,x2,y2]
 ```
-## Dataset class
+Where `x1`,`y1`,`x2`,`y2` are absolute points:
+- `x1`,`y1`: top-left coordinates
+- `x2`,`y2`: bottom-right coordinates
+# Dataset class
 For every dataset that is created there is always a `.py` file inside `./scripts/dataset/`. The dataset can be `local` or `online`:
 - `local`: the dataset you want to use for generating the training data is already in your pc, you just need to convert it in the specified [format](#dataset-format) 
-- `online`: the annotations and images or only the annotations are available online, the `download_data()` automatically downloads the data and stores them in the `./data` folder in the specified [format](#dataset-format)
+- `online`: the annotations and images or only the annotations are available online, the `download()` automatically downloads images and labels and stores them in the `./data` folder in the specified [format](#dataset-format)
 
-The `Dataset` class has 2 parameters: 
-- `online_datasets`: it's a dictionary where each string is associated with a download link.
-  - every key should have the same name of the folder inside `./data/'Dataset'/`
-  - if dataset does not have `variants` then there is only one instance where key has the same name of the class.
-- `local_datasets`: list of strings, where each string is the name of the local dataset
-  - every key should have the same name of the folder inside `./data/'Dataset'/`
+This is an example of a `.py` file for a dataset:
 ```py
-from dataset import Dataset
+from .dataset import Dataset
 
-class CustomDataset(Dataset):
-    def __init__(self):
-        super().__init__(
-            local_datasets = [
-                "sub-dataset-1",
-                "sub-dataset-2", 
-                "..."
-            ],
-            online_datasets = {
-                "sub-dataset-3": "link/to/sub-dataset-3"
-                "sub-dataset-4": "link/to/sub-dataset-4"
-                "...": "...."
-            }
-        )
+CONFIG = {...}
 
-    def download_data(self, dataset:str | None = None) -> None:
-        super().download_data(dataset)
+class dataset(Dataset):
+    def __init__(
+        self,
+        config: dict
+    ) -> None:
+        super().__init__(config)
+
+    def download(self):
+        super().download()
+        # code
 ```
+- `CONFIG`: specify the download links for `images` and `labels`, defines also the structure inside the `./data/` folder:
+  ```py
+  # local dataset case
+  CONFIG = {}
+
+  # type-1 dataset case
+  CONFIG = {
+      "dataset-name": "..."
+  }
+
+  # type-2 dataset case
+  CONFIG = {
+      "sub-1": "...",
+      "sub-2": "...",
+  }
+  ```
+- `dataset` class: takes only the `CONFIG` as input
+
+More information can be found [here](./AddDataset.md) 
