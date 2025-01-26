@@ -80,8 +80,3 @@ class DoctrGenerator(Generator):
                 os.makedirs(f"../../output/doctr-rec/{split}/images", exist_ok=True)
                 label_dir = os.listdir(f"{current_path}/{split}")
                 label_dir.sort()
-
-
-x = DoctrGenerator(["funsd","xfund-de"])
-
-x.generate_det_data()
