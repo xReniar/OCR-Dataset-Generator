@@ -42,7 +42,11 @@ When everything is set up just run:
 ```shell
 python3 generate.py
 ```
+## docTR output
+## MMOCR output
+## paddleOCR output
 
-# Tutorial
-- [Dataset](./docs/Dataset.md)
+# Docs
+- [Understand how datasets works](./docs/Dataset.md)
 - [Add new Dataset](./docs/AddDataset.md)
+- [Add new Generator](./docs/AddGenerator.md)
