@@ -1,4 +1,5 @@
-from generator import Generator
+from .generator import Generator
+from PIL import Image
 import os
 import json
 
@@ -6,10 +7,12 @@ import json
 class PaddleOCRGenerator(Generator):
     def __init__(
         self,
+        test_name: str,
         datasets: list,
         transforms = None
     ) -> None:
         super().__init__(
+            test_name,
             datasets,
             transforms
         )
@@ -19,25 +22,21 @@ class PaddleOCRGenerator(Generator):
 
         # images copy step
         for split in ["train", "test"]:
-            label_file = open(f"../../output/{self.name()}-det/{split}_label.txt","w")
+            label_file = open(f"{self._root_path}/{split}_label.txt","w")
             for dataset in self.datasets:
-                current_path = f"../../data/{dataset}"
-                imgs_dir = sorted(os.listdir(f"{current_path}/images"))
-                extension_map = {}
-                for img in imgs_dir:
-                    name, _ = img.split(".")
-                    extension_map[f"{name}.txt"] = img
+                current_path = f"data/{dataset}"
+                extension_map = self.extension_map(sorted(os.listdir(f"{current_path}/images")))
 
-                label_dir = os.listdir(f"{current_path}/{split}")
+                label_dir = sorted(os.listdir(f"{current_path}/{split}"))
 
-                # copy images
                 self.copy_file(
                     sorted(label_dir),
                     extension_map,
                     current_path,
-                    f"../../output/{self.name()}-det/{split}"
+                    f"{self._root_path}/{split}"
                 )
 
+                label_content = []
                 # labels creation
                 for label in label_dir:
                     img_name = extension_map[label]
@@ -50,10 +49,30 @@ class PaddleOCRGenerator(Generator):
                             transcription=text,
                             points = [[x1, y1],[x2, y1],[x2, y2],[x1, y2]]
                         ))
-                    label_file.write(f"{split}/{img_name}\t{json.dumps(annotations)}\n")
-                
+                    label_content.append(f"{split}/{img_name}\t{json.dumps(annotations)}\n")
+                label_file.writelines(label_content)
             label_file.close()
                     
 
     def generate_rec_data(self):
         super().generate_rec_data()
+        
+        for split in ["train", "test"]:
+            label_file = open(f"{self._root_path}/{split}_label.txt","w")
+            for dataset in self.datasets:
+                current_path = f"data/{dataset}"
+                imgs_dir = sorted(os.listdir(f"{current_path}/images"))
+                extension_map = self.extension_map(imgs_dir)
+                label_dir = sorted(os.listdir(f"{current_path}/{split}"))
+
+                label_content = []
+                for label in label_dir:
+                    text_file = open(f"{current_path}/{split}/{label}", "r")
+                    img = Image.open(f"{current_path}/images/{extension_map[label]}")
+                    for index, (text, bbox) in enumerate(self.read_rows(text_file)):
+                        crop_name = extension_map[label].replace(".",f"-{index}.")
+                        img.crop(bbox).save(f"{self._root_path}/{split}/{crop_name}")
+                        label_content.append(f"{split}/{crop_name}\t{text}\n")
+                    text_file.close()
+                label_file.writelines(label_content)
+            label_file.close()
