@@ -60,6 +60,10 @@ class Dataset(ABC):
         os.makedirs(os.path.join(self.path(),"draw"), exist_ok=True)
         imgs_dir = os.listdir(f"{self.path()}/images")
 
+        extension_map = {}
+        for img in imgs_dir:
+            name, ext = img.split(".")
+            extension_map[name] = ext
         for split in ["train", "test"]:
             os.makedirs(os.path.join(self.path(),"draw", split), exist_ok=True)
             for file in os.listdir(os.path.join(self.path(),split)):
@@ -72,14 +76,14 @@ class Dataset(ABC):
                         bbox_list.append(ast.literal_eval(bbox))
                 
                 img_name = file_path.split("/")[-1].replace("txt","")
-                extension = [f for f in imgs_dir if f.startswith(img_name)][0].split(".")[1]
+                extension = extension_map[img_name.replace(".","")]
                 
 
-                img = Image.open(f"{self.path()}/images/{img_name}{extension}")
+                img = Image.open(f"{self.path()}/images/{img_name}.{extension}")
                 draw = ImageDraw.Draw(img)
                 for bbox in bbox_list:
                     draw.rectangle(bbox, fill, outline, width)
-                img.save(f"{self.path()}/draw/{split}/{img_name}{extension}")
+                img.save(f"{self.path()}/draw/{split}/{img_name}.{extension}")
 
     def is_downloaded(
         self
