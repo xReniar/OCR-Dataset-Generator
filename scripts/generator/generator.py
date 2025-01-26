@@ -45,16 +45,16 @@ class Generator(ABC):
     def __copy_file(self, source, destination):
         shutil.copy(source, destination)
     
-    def copy_file(self, label_dir, imgs_dir, current_path, split):
+    def copy_file(self, label_dir, extension_map, src_path, dst_path):
         args = []                
         # image creation
         for label in label_dir:
-            img_name = label.replace("txt","")
-            extension = [f for f in imgs_dir if f.startswith(img_name)][0].split(".")[1]
+            img_name = label.replace(".txt","")
+            extension = extension_map[img_name]
 
-            img_name = f"{img_name}{extension}"
-            src = f"{current_path}/images/{img_name}" 
-            dst = f"../../output/doctr-det/{split}/images/{img_name}"
+            img_name = f"{img_name}.{extension}"
+            src = f"{src_path}/images/{img_name}" 
+            dst = f"{dst_path}/{img_name}"
             args.append((src, dst))
         
         processes = []
@@ -63,7 +63,6 @@ class Generator(ABC):
             processes.append(process)
             process.start()
 
-        # Aspetta la fine di tutti i processi
         for process in processes:
             process.join()
 
