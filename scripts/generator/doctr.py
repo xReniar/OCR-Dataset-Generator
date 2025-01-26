@@ -19,9 +19,8 @@ class DoctrGenerator(Generator):
     def generate_det_data(self):
         super().generate_det_data()
 
-        labels = {}
-
         for split in ["train", "test"]:
+            labels = {}
             for dataset in self.datasets:
                 current_path = f"../../data/{dataset}"
 
