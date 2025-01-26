@@ -7,10 +7,11 @@ import ast
 
 
 class Generator(ABC):
-    base_path = "../../output"
+    base_path = "output"
 
     def __init__(
         self,
+        test_name: str,
         datasets : list,
         transforms,
     ) -> None:
@@ -24,8 +25,10 @@ class Generator(ABC):
                 element = f"{dataset_root}/{element}"
             new_datasets.append(element)
 
-        self.transforms = transforms
+        self.test_name = test_name
         self.datasets:list[str] = new_datasets
+        self.transforms = transforms
+        self._root_path:str = ""
 
     def name(
         self
@@ -64,23 +67,35 @@ class Generator(ABC):
         for process in processes:
             process.join()
 
+    def extension_map(self, imgs_dir:list[str]):
+        _ext = {}
+        for img_name in imgs_dir:
+            name, _ = img_name.split(".")
+            _ext[f"{name}.txt"] = img_name
+
+        return _ext
+
+
     @abstractmethod
     def generate_det_data(
         self
     ) -> None:
-        root_path = f"{self.base_path}/{self.name()}-det"
+        self._root_path = f"{self.base_path}/{self.test_name}/{self.name()}-det"
         os.makedirs(
-            root_path,
+            self._root_path,
             exist_ok=True
         )
         for split in ["train","test"]:
-            os.makedirs(os.path.join(root_path, split), exist_ok=True)
+            os.makedirs(os.path.join(self._root_path, split), exist_ok=True)
     
     @abstractmethod
     def generate_rec_data(
         self
     ) -> None:
+        self._root_path = f"{self.base_path}/{self.test_name}/{self.name()}-rec"
         os.makedirs(
-            os.path.join(self.base_path, self.name() + "-rec"),
+            self._root_path,
             exist_ok=True
         )
+        for split in ["train","test"]:
+            os.makedirs(os.path.join(self._root_path, split), exist_ok=True)
