@@ -19,6 +19,12 @@ At the moment the datasets that can be used to generate the training data are:
 - `SROIE`: https://paperswithcode.com/paper/icdar2019-competition-on-scanned-receipt-ocr
 - `XFUND`: https://github.com/doc-analysis/XFUND (`de`,`es`,`fr`,`it`,`ja`,`pt`,`zh`)
 
+## Setup
+Install the requirements:
+```shell
+pip3 install -r requirements.txt
+```
+
 # Generate training data
 To generate the training data check the `./config/config.json` first. This json file specifies:
 - `output`: the output of the training data, stored in `./output/`
