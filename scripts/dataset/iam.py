@@ -1,10 +1,7 @@
 from .dataset import Dataset
 
 CONFIG = {
-    "iam": [
-        "",
-        ""
-    ]
+    "iam": ""
 }
 
 
