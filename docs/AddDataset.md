@@ -1,13 +1,38 @@
 # Add new Dataset
-There are 2 possible types of dataset that is possible to add: `local` and `online`.
+There are 2 possible types of dataset that is possible to add: `local` and `online`. In this tutorial suppose the name of the dataset you want to add is `custom`.
 
 ## Add local dataset
 If you want to add `local` dataset follow this steps:
 
+Create manually a `custom` folder inside `./data/`, it should look like this:
+```bash
+.
+└── data
+    ├── custom -----------> # type-1 case
+    │   ├── images
+    │   ├── test
+    │   └── train
+    ├── custom -----------> # type-2 case
+    │   ├── sub-dataset-1 ---> # variant-1 of custom
+    │   │   ├── images
+    │   │   ├── test
+    │   │   └── train
+    │   └── sub-dataset-2 ---> # variant-2 of custom
+    │       ├── images
+    │       ├── test
+    │       └── train
+    └── ....
+```
+- Inside the `images`, `train` and `test` folder put the required files explained [here](Dataset.md#dataset-format).
+
+- After this, the next steps are the same explained [here](#add-online-dataset) except:
+  - the `CONFIG` only specify the structure of the dataset and not the download links.
+  - the `download()` function can be empty since it's a local dataset
+
 ## Add online dataset
 If you want to add `online` dataset follow this steps:
 
-Suppose the dataset name is `custom` add a `custom.py` inside `./scripts/dataset/`. (It is mandatory that the character `-` should not be present in the dataset name). After creating the `.py` paste this:
+Add a `custom.py` inside `./scripts/dataset/`. (It is mandatory that the character `-` should not be present in the dataset name). After creating the `.py` paste this:
 ```py
 from .dataset import Dataset
 
