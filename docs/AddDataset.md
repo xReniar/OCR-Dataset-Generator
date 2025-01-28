@@ -67,7 +67,7 @@ CONFIG = {
 
 ## Update config.json
 After creating the dataset class update the `./config/config.json` to add the `custom` dataset, notice that if follow the same structure of the `CONFIG` file, so you can just copy it and modify the links with `y` or `n`.
-```json
+```py
 {
     "datasets": {
         "custom": "y",          # type-1 case
