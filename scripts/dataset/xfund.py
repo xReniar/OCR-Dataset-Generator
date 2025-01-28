@@ -39,9 +39,11 @@ class XFUND(Dataset):
                 fname:str = element["img"]["fname"]
 
                 file = open(f"{self.path()}/{folder}/{fname.split('.')[0]}.txt", "w")
+                file_content = []
                 for labels in document:
                     for word in labels["words"]:
-                        file.write(f"{word['text']}\t{word['box']}\n")
+                        file_content.append(f"{word['text']}\t{word['box']}\n")
+                file.writelines(file_content)
                 file.close()
 
         # download images

@@ -51,10 +51,12 @@ class FUNSD(Dataset):
                 file = open(f"{self.path()}/{split}/{annotation_file.split('.')[0]}.txt","w")
                 annotation:list = json.load(open(f"{src_folder}/{annotation_file}", "r"))["form"]
                 
+                file_content = []
                 for label in annotation:
                     for word in label["words"]:
-                        file.write(f"{word['text']}\t{word['box']}\n")
-
+                        file_content.append(f"{word['text']}\t{word['box']}\n")
+                        #file.write(f"{word['text']}\t{word['box']}\n")
+                file.writelines(file_content)
                 file.close()
 
         shutil.rmtree(os.path.join(self.path(), "dataset"))

@@ -27,6 +27,8 @@ class SROIE(Dataset):
                 file_name = image_name.replace(".jpg", ".txt")
 
                 file = open(f"{self.path()}/{split}/{file_name}","w")
+                file_content = []
                 for word, bbox in zip(words, bboxes):
-                    file.write(f"{word}\t{bbox}\n")
+                    file_content.append(f"{word}\t{bbox}\n")
+                file.writelines(file_content)
                 file.close()
