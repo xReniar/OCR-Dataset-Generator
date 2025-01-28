@@ -48,9 +48,6 @@ When everything is set up just run:
 ```shell
 python3 generate.py
 ```
-## docTR output
-## MMOCR output
-## paddleOCR output
 
 # Docs
 - [Understand how datasets works](./docs/Dataset.md)
