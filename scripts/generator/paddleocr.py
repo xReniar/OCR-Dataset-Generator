@@ -41,9 +41,8 @@ class PaddleOCRGenerator(Generator):
                 for label in label_dir:
                     img_name = extension_map[label]
 
-                    text_file = open(f"{current_path}/{split}/{label}")
                     annotations = []
-                    for (text, bbox) in self.read_rows(text_file):
+                    for (text, bbox) in self.read_rows(f"{current_path}/{split}/{label}"):
                         x1, y1, x2, y2 = bbox
                         annotations.append(dict(
                             transcription=text,
@@ -67,12 +66,10 @@ class PaddleOCRGenerator(Generator):
 
                 label_content = []
                 for label in label_dir:
-                    text_file = open(f"{current_path}/{split}/{label}", "r")
                     img = Image.open(f"{current_path}/images/{extension_map[label]}")
-                    for index, (text, bbox) in enumerate(self.read_rows(text_file)):
+                    for index, (text, bbox) in enumerate(self.read_rows(f"{current_path}/{split}/{label}")):
                         crop_name = extension_map[label].replace(".",f"-{index}.")
                         img.crop(bbox).save(f"{self._root_path}/{split}/{crop_name}")
                         label_content.append(f"{split}/{crop_name}\t{text}\n")
-                    text_file.close()
                 label_file.writelines(label_content)
             label_file.close()
