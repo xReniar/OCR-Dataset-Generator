@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 from multiprocessing import Process
 import shutil
 import os
-import _io
 import ast
 
 
@@ -37,12 +36,14 @@ class Generator(ABC):
     
     def read_rows(
         self,
-        label_file: _io.TextIOWrapper
+        label_filepath: str
     ) -> list:
         labels = []
+        label_file = open(label_filepath,"r")
         for row in label_file.readlines():
             text, bbox = row.split("\t")
             labels.append((text, tuple(ast.literal_eval(bbox))))
+        label_file.close()
         return labels
     
     def __copy_file(self, source, destination):
