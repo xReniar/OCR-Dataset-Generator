@@ -29,6 +29,8 @@ class SROIE(Dataset):
                 file = open(f"{self.path()}/{split}/{file_name}","w")
                 file_content = []
                 for word, bbox in zip(words, bboxes):
-                    file_content.append(f"{word}\t{bbox}\n")
+                    x1, y1, x2, y2 = tuple(bbox)
+                    if (x1 < x2 and y1 < y2):
+                        file_content.append(f"{word['text']}\t{bbox}\n")
                 file.writelines(file_content)
                 file.close()
