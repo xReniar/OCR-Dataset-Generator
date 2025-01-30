@@ -30,8 +30,10 @@ def generate(
 
     for task in tasks:
         if task == "det":
+            print("Start Generating data for text detection")
             ocr_generator.generate_det_data()
         if task == "rec":
+            print("Start Generating data for text recognition")
             ocr_generator.generate_rec_data()
     
 
