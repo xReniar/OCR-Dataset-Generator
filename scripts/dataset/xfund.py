@@ -42,7 +42,9 @@ class XFUND(Dataset):
                 file_content = []
                 for labels in document:
                     for word in labels["words"]:
-                        file_content.append(f"{word['text']}\t{word['box']}\n")
+                        x1, y1, x2, y2 = tuple(word['box'])
+                        if (x1 < x2 and y1 < y2):
+                            file_content.append(f"{word['text']}\t{word['box']}\n")
                 file.writelines(file_content)
                 file.close()
 
