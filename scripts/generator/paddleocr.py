@@ -48,7 +48,7 @@ class PaddleOCRGenerator(Generator):
                             transcription=text,
                             points = [[x1, y1],[x2, y1],[x2, y2],[x1, y2]]
                         ))
-                    label_content.append(f"{split}/{img_name}\t{json.dumps(annotations)}\n")
+                    label_content.append(f"{split}/{img_name}\t{json.dumps(annotations, ensure_ascii=False)}\n")
                 label_file.writelines(label_content)
             label_file.close()
                     

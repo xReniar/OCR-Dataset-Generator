@@ -80,4 +80,4 @@ class DoctrGenerator(Generator):
                     img.close()
 
             with open(f"{self._root_path}/{split}/labels.json","w") as file:
-                json.dump(labels,file, indent=4)
+                json.dump(labels,file, indent=4, ensure_ascii=False)

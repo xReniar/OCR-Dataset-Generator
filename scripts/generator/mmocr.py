@@ -108,4 +108,4 @@ class MMOCRGenerator(Generator):
                 data_list = data_list
             )
             with open(f"output/{self.test_name}/textrecog_{split}.json", "w") as file:
-                json.dump(label, file, indent=4)
+                json.dump(label, file, indent=4, ensure_ascii=False)
