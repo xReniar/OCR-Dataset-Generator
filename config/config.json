@@ -5,15 +5,15 @@
     "datasets": {
         "funsd": "y",
         "iam": "n",
-        "sroie": "n",
+        "sroie": "y",
         "xfund": {
             "xfund-de": "y",
-            "xfund-es": "n",
-            "xfund-fr": "n",
-            "xfund-it": "n",
-            "xfund-ja": "n",
+            "xfund-es": "y",
+            "xfund-fr": "y",
+            "xfund-it": "y",
+            "xfund-ja": "y",
             "xfund-pt": "y",
-            "xfund-zh": "n"
+            "xfund-zh": "y"
         }
     }
 }
