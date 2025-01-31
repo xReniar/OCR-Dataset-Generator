@@ -26,6 +26,11 @@ def generate(
         if not(dataset_instance.is_downloaded()):
             dataset_instance.download()
 
+    # check if all the labels have a corresponding image
+    for dataset in datasets.keys():
+        dataset_instance: Dataset = datasets[dataset]
+        dataset_instance.check()
+
     ocr_generator: Generator = OCR_SYSTEMS[ocr_system](test_name,list(datasets.keys()))
 
     for task in tasks:
