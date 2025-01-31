@@ -16,7 +16,6 @@ Training data generator for Text Detection and Text Recognition. The training da
 At the moment the datasets that can be used to generate the training data are:
 - `FUNSD`: https://guillaumejaume.github.io/FUNSD/
 - `SROIE`: https://paperswithcode.com/paper/icdar2019-competition-on-scanned-receipt-ocr
-    - manually download the images, because only the labels will be downloaded 
 - `XFUND`: https://github.com/doc-analysis/XFUND (`de`,`es`,`fr`,`it`,`ja`,`pt`,`zh`)
 
 The datasets that will be added are:
