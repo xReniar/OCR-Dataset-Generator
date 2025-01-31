@@ -51,6 +51,24 @@ class Dataset(ABC):
             base_path = os.path.join(base_path, self._current)
 
         return base_path
+    
+    def check(
+        self
+    ) -> bool:
+        condition = True
+
+        img_dir = list(map(lambda img: img.split(".")[0], sorted(os.listdir(f"{self.path()}/images"))))
+        train_dir = list(map(lambda img: img.split(".")[0], sorted(os.listdir(f"{self.path()}/train"))))
+        test_dir = list(map(lambda img: img.split(".")[0], sorted(os.listdir(f"{self.path()}/test"))))
+
+        label_dir = train_dir + test_dir
+        for label in label_dir:
+            if label not in img_dir:
+                print(f"Missing image for {label}.txt")
+                condition = False
+            break
+
+        return condition
 
     def draw_labels(self,
         outline: str = "black",
