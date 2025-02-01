@@ -1,5 +1,6 @@
 from .dataset import Dataset
 from datasets import load_dataset
+from PIL import Image
 import gdown
 import zipfile
 import os
@@ -20,6 +21,17 @@ class SROIE(Dataset):
         config: dict
     ) -> None:
         super().__init__(config)
+
+    def get_original_bbox(self, bbox, img_path:str):
+        img = Image.open(img_path)
+        width, height = img.width, img.height
+        img.close()
+        return [
+            int(width * bbox[0] / 1000),
+            int(height * bbox[1] / 1000),
+            int(width * bbox[2] / 1000),
+            int(height * bbox[3] / 1000),
+        ]
 
     def download(self):
         super().download()
@@ -58,8 +70,8 @@ class SROIE(Dataset):
                 file = open(f"{self.path()}/{split}/{file_name}","w")
                 file_content = []
                 for word, bbox in zip(words, bboxes):
-                    x1, y1, x2, y2 = tuple(bbox)
-                    if (x1 < x2 and y1 < y2):
-                        file_content.append(f"{word}\t{bbox}\n")
+                    img_path = f"{self.path()}/images/{image_name}"
+                    bbox = self.get_original_bbox(bbox, img_path=img_path)
+                    file_content.append(f"{word}\t{bbox}\n")
                 file.writelines(file_content)
                 file.close()
