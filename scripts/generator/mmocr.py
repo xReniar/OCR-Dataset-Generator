@@ -17,11 +17,11 @@ class MMOCRGenerator(Generator):
             transforms
         )
 
-    def generate_det_data(self):
+    def _generate_det_data(self):
         img_folder_name = "textdet_imgs"
 
         for split in ["train","test"]:
-            img_folder_path = f"output/{self.test_name}/{img_folder_name}/{split}"
+            img_folder_path = f"{self._root_path}/{img_folder_name}/{split}"
             os.makedirs(img_folder_path,exist_ok=True)
 
             data_list = []
@@ -32,7 +32,7 @@ class MMOCRGenerator(Generator):
                 labels_dir = sorted(os.listdir(f"{current_path}/{split}"))
                 extension_map = self.extension_map(imgs_dir)
                 
-                dst_path = f"output/{self.test_name}/{img_folder_name}/{split}"
+                dst_path = f"{self._root_path}/{img_folder_name}/{split}"
                 self.copy_file(
                     labels_dir,
                     extension_map,
@@ -69,16 +69,16 @@ class MMOCRGenerator(Generator):
                 data_list = data_list
             )
 
-            with open(f"output/{self.test_name}/textdet_{split}.json", "w") as file:
+            with open(f"{self._root_path}/textdet_{split}.json", "w") as file:
                 json.dump(label, file, indent=4)
 
 
 
-    def generate_rec_data(self):
+    def _generate_rec_data(self):
         img_folder_name = "textrecog_imgs"
 
         for split in ["train","test"]:
-            img_folder_path = f"output/{self.test_name}/{img_folder_name}/{split}"
+            img_folder_path = f"{self._root_path}/{img_folder_name}/{split}"
             os.makedirs(img_folder_path,exist_ok=True)
 
             data_list = []
@@ -93,7 +93,7 @@ class MMOCRGenerator(Generator):
                     img = Image.open(f"{current_path}/images/{extension_map[label]}")
                     for index, (text, bbox) in enumerate(self.read_rows(f"{current_path}/{split}/{label}")):
                         crop_name = extension_map[label].replace(".",f"-{index}.")
-                        img.crop(bbox).save(f"output/{self.test_name}/{img_folder_name}/{split}/{crop_name}")
+                        img.crop(bbox).save(f"{self._root_path}/{img_folder_name}/{split}/{crop_name}")
                         data_list.append(dict(
                             instances = [{"text": text}],
                             img_path = f"{img_folder_name}/{split}/{crop_name}"
@@ -107,5 +107,5 @@ class MMOCRGenerator(Generator):
                 ),
                 data_list = data_list
             )
-            with open(f"output/{self.test_name}/textrecog_{split}.json", "w") as file:
+            with open(f"{self._root_path}/textrecog_{split}.json", "w") as file:
                 json.dump(label, file, indent=4, ensure_ascii=False)
