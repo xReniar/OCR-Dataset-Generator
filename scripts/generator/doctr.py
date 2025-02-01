@@ -18,9 +18,10 @@ class DoctrGenerator(Generator):
             transforms
         )
 
-    def generate_det_data(self):
-        super().generate_det_data()
-
+    def _generate_det_data(self):
+        self._root_path = os.path.join(self._root_path, "Detection")
+        os.makedirs(self._root_path, exist_ok=True)
+        
         for split in ["train", "test"]:
             labels = {}
             os.makedirs(f"{self._root_path}/{split}/images", exist_ok=True)
@@ -59,8 +60,9 @@ class DoctrGenerator(Generator):
                 json.dump(labels,file, indent=4)
 
 
-    def generate_rec_data(self):
-        super().generate_rec_data()
+    def _generate_rec_data(self):
+        self._root_path = os.path.join(self._root_path, "Recognition")
+        os.makedirs(self._root_path, exist_ok=True)
 
         for split in ["train", "test"]:
             labels = {}

@@ -17,11 +17,13 @@ class PaddleOCRGenerator(Generator):
             transforms
         )
 
-    def generate_det_data(self):
-        super().generate_det_data()
+    def _generate_det_data(self):
+        self._root_path = os.path.join(self._root_path, "Detection")
+        os.makedirs(self._root_path, exist_ok=True)
 
         # images copy step
         for split in ["train", "test"]:
+            os.makedirs(os.path.join(self._root_path, split), exist_ok=True)
             label_file = open(f"{self._root_path}/{split}_label.txt","w")
             for dataset in self.datasets:
                 current_path = f"data/{dataset}"
@@ -53,10 +55,12 @@ class PaddleOCRGenerator(Generator):
             label_file.close()
                     
 
-    def generate_rec_data(self):
-        super().generate_rec_data()
+    def _generate_rec_data(self):
+        self._root_path = os.path.join(self._root_path, "Recognition")
+        os.makedirs(self._root_path, exist_ok=True)
         
         for split in ["train", "test"]:
+            os.makedirs(os.path.join(self._root_path, split), exist_ok=True)
             label_file = open(f"{self._root_path}/{split}_label.txt","w")
             for dataset in self.datasets:
                 current_path = f"data/{dataset}"
