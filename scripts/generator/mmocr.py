@@ -18,7 +18,10 @@ class MMOCRGenerator(Generator):
         )
 
     def _generate_det_data(self):
-        img_folder_name = "textdet_imgs"
+        self._root_path = os.path.join(self._root_path, "Detection")
+        os.makedirs(self._root_path, exist_ok=True)
+
+        img_folder_name = "imgs"
 
         for split in ["train","test"]:
             img_folder_path = f"{self._root_path}/{img_folder_name}/{split}"
@@ -69,13 +72,15 @@ class MMOCRGenerator(Generator):
                 data_list = data_list
             )
 
-            with open(f"{self._root_path}/textdet_{split}.json", "w") as file:
+            with open(f"{self._root_path}/{split}.json", "w") as file:
                 json.dump(label, file, indent=4)
 
 
 
     def _generate_rec_data(self):
-        img_folder_name = "textrecog_imgs"
+        self._root_path = os.path.join(self._root_path, "Recognition")
+        os.makedirs(self._root_path, exist_ok=True)
+        img_folder_name = "imgs"
 
         for split in ["train","test"]:
             img_folder_path = f"{self._root_path}/{img_folder_name}/{split}"
@@ -107,5 +112,5 @@ class MMOCRGenerator(Generator):
                 ),
                 data_list = data_list
             )
-            with open(f"{self._root_path}/textrecog_{split}.json", "w") as file:
+            with open(f"{self._root_path}/{split}.json", "w") as file:
                 json.dump(label, file, indent=4, ensure_ascii=False)
