@@ -59,6 +59,12 @@ To check if the bounding boxes are correct run
 python3 generate.py --draw
 ```
 This command creates a `draw` folder inside the dataset folder, where all the bounding boxes in the `train` and `test` folder are drawn.
+
+# Data output
+Below are shown the output folder after the generation of the training data, and instruction on how to use them. The examples below suppose that both tasks are executed:
+- [doctr output](./docs/output_doctr.md)
+- [mmocr output](./docs/output_mmocr.md)
+- [paddleocr output](./docs/output_paddleocr.md)
 # Docs
 - [Understand how datasets works](./docs/Dataset.md)
 - [Add new Dataset](./docs/AddDataset.md)
