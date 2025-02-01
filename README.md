@@ -48,12 +48,17 @@ To generate the training data check the `./config/config.json` first. This json 
 
 When everything is set up just run:
 ```shell
-python3 generate.py
+python3 generate.py --generate
 ```
 The generation of the training data won't start unless this errors are not solved:
 - label does not have a corresponding image
 - the values of bounding box are wrong
 
+To check if the bounding boxes are correct run
+```shell
+python3 generate.py --draw
+```
+This command creates a `draw` folder inside the dataset folder, where all the bounding boxes in the `train` and `test` folder are drawn.
 # Docs
 - [Understand how datasets works](./docs/Dataset.md)
 - [Add new Dataset](./docs/AddDataset.md)
