@@ -43,7 +43,7 @@ def generate(
     else:
         with open("errors.json", "w") as error_file:
             json.dump(errors, error_file, indent=4, ensure_ascii=False)
-        print("Some bbox values are wrong, details in `./labels.json`. " + 
+        print("Some bbox values are wrong, details in `./errors.json`. " + 
               "Correct them before generating data")
     
 
