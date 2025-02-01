@@ -50,10 +50,9 @@ When everything is set up just run:
 ```shell
 python3 generate.py
 ```
-You might get errors when:
+The generation of the training data won't start unless this errors are not solved:
 - label does not have a corresponding image
 - the values of bounding box are wrong
-The generation of the training data won't start unless this errors are not solved
 
 # Docs
 - [Understand how datasets works](./docs/Dataset.md)
