@@ -76,27 +76,20 @@ class Generator(ABC):
 
         return _ext
 
+    def generate_data(self, task:str):
+        self._root_path = f"{self.base_path}/{self.test_name}-{self.name()}"
+        os.makedirs(self._root_path, exist_ok=True)
+
+        if task == "det":
+            self._generate_det_data()
+        if task == "rec":
+            self._generate_rec_data()
+
 
     @abstractmethod
-    def generate_det_data(
-        self
-    ) -> None:
-        self._root_path = f"{self.base_path}/{self.test_name}/{self.name()}-det"
-        os.makedirs(
-            self._root_path,
-            exist_ok=True
-        )
-        for split in ["train","test"]:
-            os.makedirs(os.path.join(self._root_path, split), exist_ok=True)
+    def _generate_det_data(self) -> None:
+        pass
     
     @abstractmethod
-    def generate_rec_data(
-        self
-    ) -> None:
-        self._root_path = f"{self.base_path}/{self.test_name}/{self.name()}-rec"
-        os.makedirs(
-            self._root_path,
-            exist_ok=True
-        )
-        for split in ["train","test"]:
-            os.makedirs(os.path.join(self._root_path, split), exist_ok=True)
+    def _generate_rec_data(self) -> None:
+        pass
