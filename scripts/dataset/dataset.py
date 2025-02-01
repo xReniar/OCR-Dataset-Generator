@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from PIL import Image, ImageDraw
 import os
 import ast
+import json
 
 
 class Dataset(ABC):
@@ -52,11 +53,9 @@ class Dataset(ABC):
 
         return base_path
     
-    def check(
+    def check_images(
         self
-    ) -> bool:
-        condition = True
-
+    ) -> None:
         img_dir = list(map(lambda img: img.split(".")[0], sorted(os.listdir(f"{self.path()}/images"))))
         train_dir = list(map(lambda img: img.split(".")[0], sorted(os.listdir(f"{self.path()}/train"))))
         test_dir = list(map(lambda img: img.split(".")[0], sorted(os.listdir(f"{self.path()}/test"))))
@@ -64,11 +63,29 @@ class Dataset(ABC):
         label_dir = train_dir + test_dir
         for label in label_dir:
             if label not in img_dir:
-                print(f"Missing image for {label}.txt")
-                condition = False
+                raise Exception(f"Missing image for {label}.txt")
             break
+    
+    def check_labels(
+        self,
+        errors: dict
+    ) -> None:
+        for split in ["train", "test"]:
+            label_dir = sorted(os.listdir(f"{self.path()}/{split}"))
+        
+            for label in label_dir:
+                with open(os.path.join(self.path(), split, label), "r") as file:
+                    for i, row in enumerate(file.readlines()):
+                        text, bbox = row.split("\t")
+                        x1, y1, x2, y2 = tuple(ast.literal_eval(bbox))
+                        if not(x1 < x2 and y1 < y2):
+                            errors[f"{self._current}/{split}/{label}"] = dict(
+                                line = i + 1,
+                                text = text,
+                                bbox = [x1, y1, x2, y2]
+                            )
 
-        return condition
+
 
     def draw_labels(self,
         outline: str = "black",
@@ -77,6 +94,8 @@ class Dataset(ABC):
     ) -> None:
         os.makedirs(os.path.join(self.path(),"draw"), exist_ok=True)
         imgs_dir = os.listdir(f"{self.path()}/images")
+
+        print(f"Draw labels for {self._root_name()}")
 
         extension_map = {}
         for img in imgs_dir:
@@ -97,11 +116,11 @@ class Dataset(ABC):
                 extension = extension_map[img_name.replace(".","")]
                 
 
-                img = Image.open(f"{self.path()}/images/{img_name}.{extension}")
+                img = Image.open(f"{self.path()}/images/{img_name}{extension}")
                 draw = ImageDraw.Draw(img)
                 for bbox in bbox_list:
                     draw.rectangle(bbox, fill, outline, width)
-                img.save(f"{self.path()}/draw/{split}/{img_name}.{extension}")
+                img.save(f"{self.path()}/draw/{split}/{img_name}{extension}")
 
     def is_downloaded(
         self
