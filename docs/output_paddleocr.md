@@ -14,3 +14,6 @@
             ├── test_label.txt
             └── train_label.txt
 ```
+## Text Detection training
+
+## Text Recognition training

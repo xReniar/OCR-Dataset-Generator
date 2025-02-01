@@ -18,3 +18,6 @@
                 ├── images
                 └── labels.json
 ```
+## Text Detection training
+
+## Text Recognition training
