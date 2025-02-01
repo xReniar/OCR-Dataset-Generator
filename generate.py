@@ -1,6 +1,7 @@
 from scripts.dataset import *
 from scripts.generator import *
 import json
+import os
 
 
 def generate(
@@ -19,27 +20,31 @@ def generate(
             datasets[dataset] = dataset_instance
         else:
             datasets[dataset] = DATASETS[dataset.upper()](CONFIG[dataset.upper()])
-
-    # download if necessary
-    for dataset in datasets.keys():
+        
+        # download if necessary
         dataset_instance: Dataset = datasets[dataset]
         if not(dataset_instance.is_downloaded()):
             dataset_instance.download()
 
     # check if all the labels have a corresponding image
+    # also check if there are wrong bounding boxes
+    errors = {}
     for dataset in datasets.keys():
         dataset_instance: Dataset = datasets[dataset]
-        dataset_instance.check()
+        dataset_instance.check_images()
+        dataset_instance.check_labels(errors)
+        #dataset_instance.draw_labels()
 
-    ocr_generator: Generator = OCR_SYSTEMS[ocr_system](test_name,list(datasets.keys()))
+    if not(len(list(errors.keys())) != 0):
+        ocr_generator: Generator = OCR_SYSTEMS[ocr_system](test_name,list(datasets.keys()))
 
-    for task in tasks:
-        if task == "det":
-            print("Start Generating data for text detection")
-            ocr_generator.generate_det_data()
-        if task == "rec":
-            print("Start Generating data for text recognition")
-            ocr_generator.generate_rec_data()
+        for task in tasks:
+            ocr_generator.generate_data(task)
+    else:
+        with open("errors.json", "w") as error_file:
+            json.dump(errors, error_file, indent=4, ensure_ascii=False)
+        print("Some bbox values are wrong, details in `./labels.json`. " + 
+              "Correct them before generating data")
     
 
 if __name__ == "__main__":
