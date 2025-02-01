@@ -1,14 +1,15 @@
 from scripts.dataset import *
 from scripts.generator import *
 import json
-import os
+import argparse
 
 
-def generate(
+def main(
     test_name: str,
     ocr_system: str,
     tasks: list,
-    datasets: dict
+    datasets: dict,
+    args
 ) -> None:
     
     # create dataset objects
@@ -33,19 +34,36 @@ def generate(
         dataset_instance: Dataset = datasets[dataset]
         dataset_instance.check_images()
         dataset_instance.check_labels(errors)
-        #dataset_instance.draw_labels()
 
-    if not(len(list(errors.keys())) != 0):
-        ocr_generator: Generator = OCR_SYSTEMS[ocr_system](test_name,list(datasets.keys()))
+    if args.draw:
+        for dataset in datasets.keys():
+            dataset_instance: Dataset = datasets[dataset]
+            dataset_instance.draw_labels()
+    if args.generate:
+        if not(len(list(errors.keys())) != 0):
+            ocr_generator: Generator = OCR_SYSTEMS[ocr_system](test_name,list(datasets.keys()))
 
-        for task in tasks:
-            ocr_generator.generate_data(task)
-    else:
-        with open("errors.json", "w") as error_file:
-            json.dump(errors, error_file, indent=4, ensure_ascii=False)
-        print("Some bbox values are wrong, details in `./errors.json`. " + 
-              "Correct them before generating data")
-    
+            for task in tasks:
+                ocr_generator.generate_data(task)
+        else:
+            with open("errors.json", "w") as error_file:
+                json.dump(errors, error_file, indent=4, ensure_ascii=False)
+            print("Some bbox values are wrong, details in `./errors.json`. " + 
+                "Correct them before generating data")
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Training data generator for Text Detection and Text Recognition",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--draw", action="store_true", help="Avvia la modalità di disegno")
+    group.add_argument("--generate", action="store_true", help="Avvia la modalità di generazione")
+
+    args = parser.parse_args()
+
+    return args
 
 if __name__ == "__main__":
     config:dict = json.load(open("config/config.json", "r"))
@@ -71,9 +89,12 @@ if __name__ == "__main__":
         else:
             raise ValueError(f"Type '{type(value)}' not available")
     
-    generate(
+    args = parse_args()
+
+    main(
         config["test-name"],
         config["ocr-system"],
         config["tasks"],
-        selected_datasets
+        selected_datasets,
+        args
     )
