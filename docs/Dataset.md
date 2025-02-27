@@ -55,7 +55,7 @@ Where `x1`,`y1`,`x2`,`y2` are absolute points:
 - `x1`,`y1`: top-left coordinates
 - `x2`,`y2`: bottom-right coordinates
 # Dataset class
-For every dataset that is created there is always a `.py` file inside `./scripts/dataset/`. The dataset can be `local` or `online`:
+For every dataset that is created there is always a `.py` file inside `./src/dataset/`. The dataset can be `local` or `online`:
 - `local`: the dataset you want to use for generating the training data is already in your pc, you just need to convert it in the specified [format](#dataset-format) 
 - `online`: the annotations and images or only the annotations are available online, the `download()` automatically downloads images and labels and stores them in the `./data` folder in the specified [format](#dataset-format)
 

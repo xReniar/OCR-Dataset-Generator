@@ -32,7 +32,7 @@ Create manually a `custom` folder inside `./data/`, it should look like this:
 ## Add online dataset
 If you want to add `online` dataset follow this steps:
 
-Add a `custom.py` inside `./scripts/dataset/`. (It is mandatory that the character `-` should not be present in the dataset name). After creating the `.py` paste this:
+Add a `custom.py` inside `./src/dataset/`. (It is mandatory that the character `-` should not be present in the dataset name). After creating the `.py` paste this:
 ```py
 from .dataset import Dataset
 
