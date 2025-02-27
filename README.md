@@ -48,7 +48,7 @@ To generate the training data check the `./config/config.json` first. This json 
 
 When everything is set up just run:
 ```shell
-python3 generate.py --generate
+python3 main.py --generate
 ```
 The generation of the training data won't start unless this errors are not solved:
 - label does not have a corresponding image
@@ -56,7 +56,7 @@ The generation of the training data won't start unless this errors are not solve
 
 To check if the bounding boxes are correct run
 ```shell
-python3 generate.py --draw
+python3 main.py --draw
 ```
 This command creates a `draw` folder inside the dataset folder, where all the bounding boxes in the `train` and `test` folder are drawn.
 
