@@ -1,5 +1,5 @@
-from scripts.dataset import *
-from scripts.generator import *
+from src.dataset import *
+from src.generator import *
 import json
 import argparse
 
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     if len(defined_classes) > len(config_classes):
         raise BaseException("There are some datasets that are not in the `config.json`")
     if len(defined_classes) < len(config_classes):
-        raise BaseException("Some datasets in the `config.json` do not have a script in `./scripts/dataset/`")
+        raise BaseException("Some datasets in the `config.json` do not have a script in `./src/dataset/`")
 
     selected_datasets = {}
     for dataset in list(datasets.keys()):
