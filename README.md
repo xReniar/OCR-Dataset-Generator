@@ -69,3 +69,7 @@ Below are shown the output folder after the generation of the training data, and
 - [Understand how datasets works](./docs/Dataset.md)
 - [Add new Dataset](./docs/AddDataset.md)
 - [Add new Generator](./docs/AddGenerator.md)
+
+## Future developments
+- Add workflow for data augmentation
+- Modify dataset to manage rotated text
