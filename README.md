@@ -20,6 +20,7 @@ At the moment the datasets that can be used to generate the training data are:
 
 The datasets that will be added are:
 - `IAM`: https://fki.tic.heia-fr.ch/databases/iam-handwriting-database
+- `GNHK`: https://www.goodnotes.com/gnhk
 
 ## Setup
 Install the requirements:
