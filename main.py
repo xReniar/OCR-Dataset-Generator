@@ -1,10 +1,11 @@
 from src.dataset import *
 from src.generator import *
 import json
+import yaml
 import argparse
 
 
-def main(
+def generate(
     test_name: str,
     ocr_system: str,
     tasks: list,
@@ -91,7 +92,7 @@ if __name__ == "__main__":
     
     args = parse_args()
 
-    main(
+    generate(
         config["test-name"],
         config["ocr-system"],
         config["tasks"],
