@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import ast
 
 
 class Dataloader(ABC):
@@ -11,13 +12,24 @@ class Dataloader(ABC):
 
         self.transforms = transforms
         self.datasets = datasets
+        self.data = {}
 
-        self.train_data = []
-        self.test_data = []
+        self.load_data()
 
-        #self.load_data()
+    def read_label(
+        self,
+        label_path:str
+    ) -> None:
+        label_content = []
+        with open(label_path, "r") as label:
+            label = label.readlines()
+            for row in label:
+                text, bbox = tuple(row.split("\t"))
+                bbox = ast.literal_eval(bbox.strip("\n"))
+                label_content.append((text, bbox))
+
+        return label_content
 
     @abstractmethod
-    def load_data(self, split:str):
+    def load_data(self):
         pass
-    
