@@ -3,13 +3,13 @@ Training data generator for Text Detection and Text Recognition. The training da
 
 <p align="center">
     <a href="https://github.com/mindee/doctr">
-        <img src="./icons/doctr.png" width="70">
+        <img src="./docs/icons/doctr.png" width="70">
     </a>
     <a href="https://github.com/open-mmlab/mmocr">
-        <img src="./icons/mmocr.png" width="70">
+        <img src="./docs/icons/mmocr.png" width="70">
     </a>
     <a href="https://github.com/PaddlePaddle/PaddleOCR">
-        <img src="./icons/paddleocr.jpeg" width="70">
+        <img src="./docs/icons/paddleocr.jpeg" width="70">
     </a>
 </p>
 
