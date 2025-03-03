@@ -31,21 +31,19 @@ class MMOCRGenerator(Generator):
             for dataset in self.datasets:
                 current_path = f"data/{dataset}"
 
-                imgs_dir = sorted(os.listdir(f"{current_path}/images"))
                 labels_dir = sorted(os.listdir(f"{current_path}/{split}"))
-                extension_map = self.extension_map(imgs_dir)
                 
                 dst_path = f"{self._root_path}/{img_folder_name}/{split}"
                 self.copy_file(
                     labels_dir,
-                    extension_map,
                     current_path,
                     dst_path
                 )
 
                 current_data_list = []
                 for label in labels_dir:
-                    img = Image.open(f"{current_path}/images/{extension_map[label]}")
+                    img_fn = label.replace(".txt","")
+                    img = Image.open(f"{current_path}/images/{img_fn}")
                     instances = []
                     for (_, bbox) in self.read_rows(f"{current_path}/{split}/{label}"):
                         x1, y1, x2, y2 = list(map(lambda point: float(point), bbox))
@@ -57,7 +55,7 @@ class MMOCRGenerator(Generator):
                         ))
                     current_data_list.append(dict(
                         instances = instances,
-                        img_path = f"{img_folder_name}/{split}/{extension_map[label]}",
+                        img_path = f"{img_folder_name}/{split}/{img_fn}",
                         width = img.width,
                         height = img.height
                     ))
@@ -90,14 +88,13 @@ class MMOCRGenerator(Generator):
             for dataset in self.datasets:
                 current_path = f"data/{dataset}"
 
-                imgs_dir = sorted(os.listdir(f"{current_path}/images"))
                 labels_dir = sorted(os.listdir(f"{current_path}/{split}"))
-                extension_map = self.extension_map(imgs_dir)
 
                 for label in labels_dir:
-                    img = Image.open(f"{current_path}/images/{extension_map[label]}")
+                    img_fn = label.replace(".txt","")
+                    img = Image.open(f"{current_path}/images/{img_fn}")
                     for index, (text, bbox) in enumerate(self.read_rows(f"{current_path}/{split}/{label}")):
-                        crop_name = extension_map[label].replace(".",f"-{index}.")
+                        crop_name = img_fn.replace(".",f"-{index}.")
                         img.crop(bbox).save(f"{self._root_path}/{img_folder_name}/{split}/{crop_name}")
                         data_list.append(dict(
                             instances = [{"text": text}],

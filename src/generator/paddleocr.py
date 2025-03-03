@@ -27,13 +27,11 @@ class PaddleOCRGenerator(Generator):
             label_file = open(f"{self._root_path}/{split}_label.txt","w")
             for dataset in self.datasets:
                 current_path = f"data/{dataset}"
-                extension_map = self.extension_map(sorted(os.listdir(f"{current_path}/images")))
 
                 label_dir = sorted(os.listdir(f"{current_path}/{split}"))
 
                 self.copy_file(
                     sorted(label_dir),
-                    extension_map,
                     current_path,
                     f"{self._root_path}/{split}"
                 )
@@ -41,7 +39,7 @@ class PaddleOCRGenerator(Generator):
                 label_content = []
                 # labels creation
                 for label in label_dir:
-                    img_name = extension_map[label]
+                    img_name = label.replace(".txt","")
 
                     annotations = []
                     for (text, bbox) in self.read_rows(f"{current_path}/{split}/{label}"):
@@ -64,15 +62,14 @@ class PaddleOCRGenerator(Generator):
             label_file = open(f"{self._root_path}/{split}_label.txt","w")
             for dataset in self.datasets:
                 current_path = f"data/{dataset}"
-                imgs_dir = sorted(os.listdir(f"{current_path}/images"))
-                extension_map = self.extension_map(imgs_dir)
                 label_dir = sorted(os.listdir(f"{current_path}/{split}"))
 
                 label_content = []
                 for label in label_dir:
-                    img = Image.open(f"{current_path}/images/{extension_map[label]}")
+                    img_name = label.replace(".txt","")
+                    img = Image.open(f"{current_path}/images/{img_name}")
                     for index, (text, bbox) in enumerate(self.read_rows(f"{current_path}/{split}/{label}")):
-                        crop_name = extension_map[label].replace(".",f"-{index}.")
+                        crop_name = img_name.replace(".",f"-{index}.")
                         img.crop(bbox).save(f"{self._root_path}/{split}/{crop_name}")
                         label_content.append(f"{split}/{crop_name}\t{text}\n")
                 label_file.writelines(label_content)
