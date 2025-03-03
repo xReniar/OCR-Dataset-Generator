@@ -1,7 +1,7 @@
 from .dataset import Dataset
 
 CONFIG = {
-    "iam": ""
+    "iam": "naderabdalghani/iam-handwritten-forms-dataset"
 }
 
 
