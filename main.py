@@ -1,11 +1,11 @@
-from src.dataset import *
+from src.dataset import DATASETS, CONFIG, Dataset
 from src.generator import *
 import json
 import yaml
 import argparse
 
 
-def generate(
+def main(
     test_name: str,
     ocr_system: str,
     tasks: list,
@@ -18,7 +18,7 @@ def generate(
         if "-" in dataset:
             root:str = dataset.split("-")[0].upper()
             dataset_instance:Dataset = DATASETS[root](CONFIG[root])
-            dataset_instance.set_to(dataset)
+            dataset_instance.set_subdataset(dataset)
             datasets[dataset] = dataset_instance
         else:
             datasets[dataset] = DATASETS[dataset.upper()](CONFIG[dataset.upper()])
@@ -27,6 +27,7 @@ def generate(
         dataset_instance: Dataset = datasets[dataset]
         if not(dataset_instance.is_downloaded()):
             dataset_instance.download()
+            dataset_instance.adjust_label_name()
 
     # check if all the labels have a corresponding image
     # also check if there are wrong bounding boxes
@@ -40,6 +41,7 @@ def generate(
         for dataset in datasets.keys():
             dataset_instance: Dataset = datasets[dataset]
             dataset_instance.draw_labels()
+    
     if args.generate:
         if not(len(list(errors.keys())) != 0):
             ocr_generator: Generator = OCR_SYSTEMS[ocr_system](test_name,list(datasets.keys()))
@@ -49,8 +51,7 @@ def generate(
         else:
             with open("errors.json", "w") as error_file:
                 json.dump(errors, error_file, indent=4, ensure_ascii=False)
-            print("Some bbox values are wrong, details in `./errors.json`. " + 
-                "Correct them before generating data")
+            print("Some bbox values are wrong, details in `./errors.json`. Correct them before generating data")
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -59,8 +60,8 @@ def parse_args():
     )
 
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--draw", action="store_true", help="Avvia la modalità di disegno")
-    group.add_argument("--generate", action="store_true", help="Avvia la modalità di generazione")
+    group.add_argument("--draw", action="store_true", help="Draw labels")
+    group.add_argument("--generate", action="store_true", help="Start training data generation")
 
     args = parser.parse_args()
 
@@ -92,7 +93,7 @@ if __name__ == "__main__":
     
     args = parse_args()
 
-    generate(
+    main(
         config["test-name"],
         config["ocr-system"],
         config["tasks"],
