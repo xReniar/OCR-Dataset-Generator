@@ -8,11 +8,12 @@ import argparse
 def main(
     test_name: str,
     ocr_system: str,
-    tasks: list,
+    tasks: dict,
     datasets: dict,
     args
 ) -> None:
-    
+    augmentation_config = yaml.safe_load(open("./config/augmentation.yaml", "r"))
+
     # create dataset objects
     for dataset in datasets.keys():
         if "-" in dataset:
@@ -44,10 +45,12 @@ def main(
     
     if args.generate:
         if not(len(list(errors.keys())) != 0):
-            ocr_generator: Generator = OCR_SYSTEMS[ocr_system](test_name,list(datasets.keys()))
-
-            for task in tasks:
-                ocr_generator.generate_data(task)
+            ocr_generator: Generator = OCR_SYSTEMS[ocr_system](
+                test_name,
+                list(datasets.keys()),
+                augmentation_config
+            )
+            ocr_generator.generate_data(tasks)
         else:
             with open("errors.json", "w") as error_file:
                 json.dump(errors, error_file, indent=4, ensure_ascii=False)
@@ -68,9 +71,9 @@ def parse_args():
     return args
 
 if __name__ == "__main__":
-    config:dict = json.load(open("config/config.json", "r"))
-    datasets:dict = config["datasets"]
+    config:dict = yaml.safe_load(open("config/dataset.yaml", "r"))
 
+    datasets: dict = config["datasets"]
     defined_classes = list(map(lambda x: str(x).lower(), list(DATASETS.keys())))
     config_classes = list(datasets.keys())
     if len(defined_classes) > len(config_classes):
@@ -90,13 +93,17 @@ if __name__ == "__main__":
                     selected_datasets[sub] = None
         else:
             raise ValueError(f"Type '{type(value)}' not available")
+        
+    TASKS: dict = config["tasks"]
+    if not(any(value == "y" for value in TASKS.values())):
+        raise BaseException("Select at least one task. All the tasks are set to 'n'")
     
     args = parse_args()
 
     main(
         config["test-name"],
         config["ocr-system"],
-        config["tasks"],
+        TASKS,
         selected_datasets,
         args
     )
