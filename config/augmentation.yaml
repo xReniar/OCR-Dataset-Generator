@@ -1,0 +1,16 @@
+detection:
+    skewing:
+        samples: 0
+    distortion:
+        samples: 0
+    blurring:
+        samples: 0
+
+recognition:
+    skewing:
+        samples: 0
+    distortion:
+        samples: 0
+    blurring:
+        samples: 0
+
