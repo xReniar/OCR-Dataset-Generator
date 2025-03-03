@@ -2,10 +2,14 @@ from abc import ABC, abstractmethod
 from PIL import Image, ImageDraw
 import os
 import ast
-import json
 
 
 class Dataset(ABC):
+    '''
+    self.config: configuration file
+    self.sub_datasets: list of sub-datasets if it's a type 2 dataset
+    self._current: specific name of the dataset
+    '''
     def __init__(
         self,
         config:dict
@@ -21,16 +25,13 @@ class Dataset(ABC):
         else:
             self._current = self._root_name()
 
-        #self.mode = "online" if len(config.keys()) > 0 else "local"
-        
-
     def _root_name(self) -> str:
         '''
         Returns root name of the dataset
         '''
         return self.__class__.__name__.lower()
     
-    def set_to(
+    def set_subdataset(
         self,
         sub_dataset:str
     ) -> None:
@@ -52,6 +53,11 @@ class Dataset(ABC):
             base_path = os.path.join(base_path, self._current)
 
         return base_path
+    
+    def is_downloaded(
+        self
+    ) -> bool:
+        return os.path.exists(self.path())
     
     def check_images(
         self
@@ -85,7 +91,23 @@ class Dataset(ABC):
                                 bbox = [x1, y1, x2, y2]
                             )
 
+    def adjust_label_name(self):
+        if len(self.config.keys()) > 0:
+            path = self.path()
+        
+            ext_dict = {}
+            img_dir = sorted(os.listdir(f"{path}/images"))
+            for img_fn in img_dir:
+                fn, ext = tuple(img_fn.split("."))
+                ext_dict[fn] = ext
 
+            for split in ["train", "test"]:
+                for label_fn in sorted(os.listdir(f"{path}/{split}")):
+                    fn, _ = tuple(label_fn.split("."))
+                    os.rename(
+                        f"{path}/{split}/{label_fn}",
+                        f"{path}/{split}/{fn}.{ext_dict[fn]}.txt"
+                    )
 
     def draw_labels(self,
         outline: str = "black",
@@ -95,12 +117,8 @@ class Dataset(ABC):
         os.makedirs(os.path.join(self.path(),"draw"), exist_ok=True)
         imgs_dir = os.listdir(f"{self.path()}/images")
 
-        print(f"Draw labels for {self._root_name()}")
+        print(f"Draw labels for {self._current}")
 
-        extension_map = {}
-        for img in imgs_dir:
-            name, ext = img.split(".")
-            extension_map[name] = ext
         for split in ["train", "test"]:
             os.makedirs(os.path.join(self.path(),"draw", split), exist_ok=True)
             for file in os.listdir(os.path.join(self.path(),split)):
@@ -112,36 +130,13 @@ class Dataset(ABC):
                         _, bbox = row.split("\t")
                         bbox_list.append(ast.literal_eval(bbox))
                 
-                img_name = file_path.split("/")[-1].replace("txt","")
-                extension = extension_map[img_name.replace(".","")]
-                
+                img_name = file_path.split("/")[-1].replace(".txt","")
 
-                img = Image.open(f"{self.path()}/images/{img_name}{extension}")
+                img = Image.open(f"{self.path()}/images/{img_name}")
                 draw = ImageDraw.Draw(img)
                 for bbox in bbox_list:
                     draw.rectangle(bbox, fill, outline, width)
-                img.save(f"{self.path()}/draw/{split}/{img_name}{extension}")
-
-    def is_downloaded(
-        self
-    ) -> bool:
-        if os.path.exists(self.path()):
-            print(f"{self._current} already downloaded")
-            return True
-        else:
-            print(f"Downloading {self._current}")
-            return False
-    
-    def has_variants(
-        self
-    ) -> bool:
-        keys = list(self.config.keys())
-        if len(keys) == 0:
-            return False
-        if self._root_name() in keys:
-            return False
-        else:
-            return True
+                img.save(f"{self.path()}/draw/{split}/{img_name}")
 
     @abstractmethod
     def download(
