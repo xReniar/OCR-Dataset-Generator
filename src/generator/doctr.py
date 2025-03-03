@@ -1,4 +1,6 @@
 from .generator import Generator
+from ..dataloader.detLoader import DetDataloader
+from ..dataloader.recLoader import RecDataloader
 from PIL import Image
 import hashlib
 import json
@@ -18,13 +20,13 @@ class DoctrGenerator(Generator):
             transforms
         )
 
-    def _generate_det_data(self):
-        self._root_path = os.path.join(self._root_path, "Detection")
-        os.makedirs(self._root_path, exist_ok=True)
+    def _generate_det_data(self, dataloader: DetDataloader):
+        root_path = os.path.join(self.root_path, "Detection")
+        os.makedirs(root_path, exist_ok=True)
         
         for split in ["train", "test"]:
             labels = {}
-            os.makedirs(f"{self._root_path}/{split}/images", exist_ok=True)
+            os.makedirs(f"{root_path}/{split}/images", exist_ok=True)
             for dataset in self.datasets:
                 current_path = f"data/{dataset}"
 
@@ -34,7 +36,7 @@ class DoctrGenerator(Generator):
                 self.copy_file(
                     label_dir,
                     current_path,
-                    f"{self._root_path}/{split}/images",
+                    f"{root_path}/{split}/images",
                 )
 
                 # labels creation
@@ -53,30 +55,27 @@ class DoctrGenerator(Generator):
                         polygons = polygons
                     )
                     img.close()
-            with open(f"{self._root_path}/{split}/labels.json","w") as file:
+            with open(f"{root_path}/{split}/labels.json","w") as file:
                 json.dump(labels,file, indent=4)
 
-
-    def _generate_rec_data(self):
-        self._root_path = os.path.join(self._root_path, "Recognition")
-        os.makedirs(self._root_path, exist_ok=True)
+    def _generate_rec_data(self, dataloader: RecDataloader):
+        root_path = os.path.join(self.root_path, "Recognition")
+        os.makedirs(root_path, exist_ok=True)
 
         for split in ["train", "test"]:
             labels = {}
-            os.makedirs(f"{self._root_path}/{split}/images", exist_ok=True)
+            os.makedirs(f"{root_path}/{split}/images", exist_ok=True)
             for dataset in self.datasets:
                 current_path = f"data/{dataset}"
-
-                imgs_dir = sorted(os.listdir(f"{current_path}/images"))
 
                 for label in sorted(os.listdir(f"{current_path}/{split}")):
                     img_fn = label.replace(".txt", "")
                     img = Image.open(f"{current_path}/images/{img_fn}")
                     for index, (text, bbox) in enumerate(self.read_rows(f"{current_path}/{split}/{label}")):
                         crop_name = img_fn.replace(".",f"-{index}.")
-                        img.crop(bbox).save(f"{self._root_path}/{split}/images/{crop_name}")
+                        img.crop(bbox).save(f"{root_path}/{split}/images/{crop_name}")
                         labels[crop_name] = text
                     img.close()
 
-            with open(f"{self._root_path}/{split}/labels.json","w") as file:
+            with open(f"{root_path}/{split}/labels.json","w") as file:
                 json.dump(labels,file, indent=4, ensure_ascii=False)

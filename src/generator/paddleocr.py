@@ -1,4 +1,6 @@
 from .generator import Generator
+from ..dataloader.detLoader import DetDataloader
+from ..dataloader.recLoader import RecDataloader
 from PIL import Image
 import os
 import json
@@ -17,14 +19,14 @@ class PaddleOCRGenerator(Generator):
             transforms
         )
 
-    def _generate_det_data(self):
-        self._root_path = os.path.join(self._root_path, "Detection")
-        os.makedirs(self._root_path, exist_ok=True)
+    def _generate_det_data(self, dataloader: DetDataloader):
+        root_path = os.path.join(self.root_path, "Detection")
+        os.makedirs(root_path, exist_ok=True)
 
         # images copy step
         for split in ["train", "test"]:
-            os.makedirs(os.path.join(self._root_path, split), exist_ok=True)
-            label_file = open(f"{self._root_path}/{split}_label.txt","w")
+            os.makedirs(os.path.join(root_path, split), exist_ok=True)
+            label_file = open(f"{root_path}/{split}_label.txt","w")
             for dataset in self.datasets:
                 current_path = f"data/{dataset}"
 
@@ -33,7 +35,7 @@ class PaddleOCRGenerator(Generator):
                 self.copy_file(
                     sorted(label_dir),
                     current_path,
-                    f"{self._root_path}/{split}"
+                    f"{root_path}/{split}"
                 )
 
                 label_content = []
@@ -51,15 +53,14 @@ class PaddleOCRGenerator(Generator):
                     label_content.append(f"{split}/{img_name}\t{json.dumps(annotations, ensure_ascii=False)}\n")
                 label_file.writelines(label_content)
             label_file.close()
-                    
 
-    def _generate_rec_data(self):
-        self._root_path = os.path.join(self._root_path, "Recognition")
-        os.makedirs(self._root_path, exist_ok=True)
+    def _generate_rec_data(self, dataloader: RecDataloader):
+        root_path = os.path.join(self.root_path, "Recognition")
+        os.makedirs(root_path, exist_ok=True)
         
         for split in ["train", "test"]:
-            os.makedirs(os.path.join(self._root_path, split), exist_ok=True)
-            label_file = open(f"{self._root_path}/{split}_label.txt","w")
+            os.makedirs(os.path.join(root_path, split), exist_ok=True)
+            label_file = open(f"{root_path}/{split}_label.txt","w")
             for dataset in self.datasets:
                 current_path = f"data/{dataset}"
                 label_dir = sorted(os.listdir(f"{current_path}/{split}"))
@@ -70,7 +71,7 @@ class PaddleOCRGenerator(Generator):
                     img = Image.open(f"{current_path}/images/{img_name}")
                     for index, (text, bbox) in enumerate(self.read_rows(f"{current_path}/{split}/{label}")):
                         crop_name = img_name.replace(".",f"-{index}.")
-                        img.crop(bbox).save(f"{self._root_path}/{split}/{crop_name}")
+                        img.crop(bbox).save(f"{root_path}/{split}/{crop_name}")
                         label_content.append(f"{split}/{crop_name}\t{text}\n")
                 label_file.writelines(label_content)
             label_file.close()

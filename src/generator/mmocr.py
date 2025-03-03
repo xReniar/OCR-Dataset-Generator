@@ -1,4 +1,6 @@
 from .generator import Generator
+from ..dataloader.detLoader import DetDataloader
+from ..dataloader.recLoader import RecDataloader
 from PIL import Image
 import os
 import json
@@ -17,14 +19,14 @@ class MMOCRGenerator(Generator):
             transforms
         )
 
-    def _generate_det_data(self):
-        self._root_path = os.path.join(self._root_path, "Detection")
-        os.makedirs(self._root_path, exist_ok=True)
+    def _generate_det_data(self, dataloader: DetDataloader):
+        root_path = os.path.join(self.root_path, "Detection")
+        os.makedirs(root_path, exist_ok=True)
 
         img_folder_name = "imgs"
 
         for split in ["train","test"]:
-            img_folder_path = f"{self._root_path}/{img_folder_name}/{split}"
+            img_folder_path = f"{root_path}/{img_folder_name}/{split}"
             os.makedirs(img_folder_path,exist_ok=True)
 
             data_list = []
@@ -33,7 +35,7 @@ class MMOCRGenerator(Generator):
 
                 labels_dir = sorted(os.listdir(f"{current_path}/{split}"))
                 
-                dst_path = f"{self._root_path}/{img_folder_name}/{split}"
+                dst_path = f"{root_path}/{img_folder_name}/{split}"
                 self.copy_file(
                     labels_dir,
                     current_path,
@@ -70,18 +72,16 @@ class MMOCRGenerator(Generator):
                 data_list = data_list
             )
 
-            with open(f"{self._root_path}/{split}.json", "w") as file:
+            with open(f"{root_path}/{split}.json", "w") as file:
                 json.dump(label, file, indent=4)
 
-
-
-    def _generate_rec_data(self):
-        self._root_path = os.path.join(self._root_path, "Recognition")
-        os.makedirs(self._root_path, exist_ok=True)
+    def _generate_rec_data(self, dataloader: RecDataloader):
+        root_path = os.path.join(self.root_path, "Recognition")
+        os.makedirs(root_path, exist_ok=True)
         img_folder_name = "imgs"
 
         for split in ["train","test"]:
-            img_folder_path = f"{self._root_path}/{img_folder_name}/{split}"
+            img_folder_path = f"{root_path}/{img_folder_name}/{split}"
             os.makedirs(img_folder_path,exist_ok=True)
 
             data_list = []
@@ -95,7 +95,7 @@ class MMOCRGenerator(Generator):
                     img = Image.open(f"{current_path}/images/{img_fn}")
                     for index, (text, bbox) in enumerate(self.read_rows(f"{current_path}/{split}/{label}")):
                         crop_name = img_fn.replace(".",f"-{index}.")
-                        img.crop(bbox).save(f"{self._root_path}/{img_folder_name}/{split}/{crop_name}")
+                        img.crop(bbox).save(f"{root_path}/{img_folder_name}/{split}/{crop_name}")
                         data_list.append(dict(
                             instances = [{"text": text}],
                             img_path = f"{img_folder_name}/{split}/{crop_name}"
@@ -109,5 +109,5 @@ class MMOCRGenerator(Generator):
                 ),
                 data_list = data_list
             )
-            with open(f"{self._root_path}/{split}.json", "w") as file:
+            with open(f"{root_path}/{split}.json", "w") as file:
                 json.dump(label, file, indent=4, ensure_ascii=False)
