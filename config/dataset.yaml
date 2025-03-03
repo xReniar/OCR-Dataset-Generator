@@ -1,0 +1,22 @@
+# test name
+test-name: train-data
+ocr-system: doctr
+
+# task to execute
+tasks:
+    det: n
+    rec: n
+
+# list of dataset to select
+datasets:
+    - funsd: y
+    - iam: n
+    - sroie: n
+    - xfund:
+        xfund-de: n
+        xfund-es: n
+        xfund-fr: n
+        xfund-it: n
+        xfund-ja: n
+        xfund-pt: n
+        xfund-zh: n
