@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 from multiprocessing import Process
+from ..dataloader.detLoader import DetDataloader
+from ..dataloader.recLoader import RecDataloader
 import shutil
 import os
 import ast
@@ -49,11 +51,11 @@ class Generator(ABC):
     def __copy_file(self, source, destination):
         shutil.copy(source, destination)
     
-    def copy_file(self, label_dir, extension_map, src_path, dst_path):
+    def copy_file(self, label_dir, src_path, dst_path):
         args = []                
         # image creation
         for label in label_dir:
-            img_name = extension_map[label]
+            img_name = label.replace(".txt", "")
             
             src = f"{src_path}/images/{img_name}" 
             dst = f"{dst_path}/{img_name}"
@@ -68,21 +70,15 @@ class Generator(ABC):
         for process in processes:
             process.join()
 
-    def extension_map(self, imgs_dir:list[str]):
-        _ext = {}
-        for img_name in imgs_dir:
-            name, _ = img_name.split(".")
-            _ext[f"{name}.txt"] = img_name
-
-        return _ext
-
     def generate_data(self, task:str):
         self._root_path = f"{self.base_path}/{self.test_name}-{self.name()}"
         os.makedirs(self._root_path, exist_ok=True)
 
         if task == "det":
+            detLoader = DetDataloader({},self.datasets)
             self._generate_det_data()
         if task == "rec":
+            recLoader = RecDataloader({}, self.datasets)
             self._generate_rec_data()
 
 
