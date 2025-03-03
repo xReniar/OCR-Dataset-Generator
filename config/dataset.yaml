@@ -4,15 +4,15 @@ ocr-system: doctr
 
 # task to execute
 tasks:
-    det: n
-    rec: n
+    det: y
+    rec: y
 
 # list of dataset to select
 datasets:
-    - funsd: y
-    - iam: n
-    - sroie: n
-    - xfund:
+    funsd: y
+    iam: n
+    sroie: n
+    xfund:
         xfund-de: n
         xfund-es: n
         xfund-fr: n
