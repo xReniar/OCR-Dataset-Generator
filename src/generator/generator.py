@@ -3,6 +3,7 @@ from multiprocessing import Process
 from ..dataloader.detLoader import DetDataloader
 from ..dataloader.recLoader import RecDataloader
 import shutil
+import yaml
 import os
 import ast
 
@@ -14,7 +15,7 @@ class Generator(ABC):
         self,
         test_name: str,
         datasets : list,
-        transforms,
+        transforms
     ) -> None:
         super().__init__()
 
@@ -29,7 +30,6 @@ class Generator(ABC):
         self.test_name = test_name
         self.datasets:list[str] = new_datasets
         self.transforms = transforms
-        self._root_path:str = ""
 
     def name(
         self
@@ -70,22 +70,22 @@ class Generator(ABC):
         for process in processes:
             process.join()
 
-    def generate_data(self, task:str):
-        self._root_path = f"{self.base_path}/{self.test_name}-{self.name()}"
-        os.makedirs(self._root_path, exist_ok=True)
+    def generate_data(self, tasks:str):
+        self.root_path = f"{self.base_path}/{self.test_name}-{self.name()}"
+        os.makedirs(self.root_path, exist_ok=True)
 
-        if task == "det":
-            detLoader = DetDataloader({},self.datasets)
-            self._generate_det_data()
-        if task == "rec":
-            recLoader = RecDataloader({}, self.datasets)
-            self._generate_rec_data()
+        if tasks["det"] == "y":
+            detLoader = DetDataloader(self.transforms["detection"], self.datasets)
+            self._generate_det_data(detLoader)
+        if tasks["rec"] == "y":
+            recLoader = RecDataloader(self.transforms["recognition"], self.datasets)
+            self._generate_rec_data(recLoader)
 
 
     @abstractmethod
-    def _generate_det_data(self) -> None:
+    def _generate_det_data(self, dataloader: DetDataloader) -> None:
         pass
     
     @abstractmethod
-    def _generate_rec_data(self) -> None:
+    def _generate_rec_data(self, dataloader: RecDataloader) -> None:
         pass
