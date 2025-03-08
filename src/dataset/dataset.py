@@ -115,7 +115,6 @@ class Dataset(ABC):
         width: int = 1
     ) -> None:
         os.makedirs(os.path.join(self.path(),"draw"), exist_ok=True)
-        imgs_dir = os.listdir(f"{self.path()}/images")
 
         print(f"Draw labels for {self._current}")
 
