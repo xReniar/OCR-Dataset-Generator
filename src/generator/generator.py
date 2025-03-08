@@ -3,7 +3,6 @@ from multiprocessing import Process
 from ..dataloader.detLoader import DetDataloader
 from ..dataloader.recLoader import RecDataloader
 import shutil
-import yaml
 import os
 import ast
 
@@ -51,7 +50,7 @@ class Generator(ABC):
     def __copy_file(self, source, destination):
         shutil.copy(source, destination)
     
-    def copy_file(self, label_dir, src_path, dst_path):
+    def copy_file(self, label_dir:list[str], src_path:str, dst_path:str):
         args = []                
         # image creation
         for label in label_dir:
