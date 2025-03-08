@@ -14,7 +14,7 @@ class Dataloader(ABC):
         self.datasets = datasets
         self.data = {}
 
-        self.load_data()
+        self._load_data()
 
     def read_label(
         self,
@@ -31,5 +31,5 @@ class Dataloader(ABC):
         return label_content
 
     @abstractmethod
-    def load_data(self):
+    def _load_data(self):
         pass
