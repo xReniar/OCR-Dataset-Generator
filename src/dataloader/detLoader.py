@@ -12,7 +12,7 @@ class DetDataloader(Dataloader):
             datasets
         )
 
-    def load_data(self) -> None:
+    def _load_data(self) -> None:
         for dataset in sorted(self.datasets):
             self.data[dataset] = dict(
                 train=[],
