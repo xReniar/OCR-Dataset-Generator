@@ -10,9 +10,9 @@ def main(
     ocr_system: str,
     tasks: dict,
     datasets: dict,
+    augmentation_config,
     args
 ) -> None:
-    augmentation_config = yaml.safe_load(open("./config/augmentation.yaml", "r"))
 
     # create dataset objects
     for dataset in datasets.keys():
@@ -71,9 +71,14 @@ def parse_args():
     return args
 
 if __name__ == "__main__":
-    config:dict = yaml.safe_load(open("config/dataset.yaml", "r"))
+    datasets_config: dict = yaml.safe_load(open("./config/dataset.yaml", "r"))
+    augmentation_config: dict = yaml.safe_load(open("./config/augmentation.yaml", "r"))
 
-    datasets: dict = config["datasets"]
+    TASKS: dict = datasets_config["tasks"]
+    TEST_NAME: str = datasets_config["test-name"]
+    OCR_SYSTEM: str = datasets_config["ocr-system"]
+
+    datasets: dict = datasets_config["datasets"]
     defined_classes = list(map(lambda x: str(x).lower(), list(DATASETS.keys())))
     config_classes = list(datasets.keys())
     if len(defined_classes) > len(config_classes):
@@ -82,7 +87,7 @@ if __name__ == "__main__":
         raise BaseException("Some datasets in the `config.json` do not have a script in `./src/dataset/`")
 
     selected_datasets = {}
-    for dataset in list(datasets.keys()):
+    for dataset in config_classes:
         value = datasets[dataset]
         if isinstance(value, str):
             if value == "y":
@@ -93,17 +98,17 @@ if __name__ == "__main__":
                     selected_datasets[sub] = None
         else:
             raise ValueError(f"Type '{type(value)}' not available")
-        
-    TASKS: dict = config["tasks"]
+
     if not(any(value == "y" for value in TASKS.values())):
         raise BaseException("Select at least one task. All the tasks are set to 'n'")
     
     args = parse_args()
 
     main(
-        config["test-name"],
-        config["ocr-system"],
+        TEST_NAME,
+        OCR_SYSTEM,
         TASKS,
         selected_datasets,
+        augmentation_config,
         args
     )
