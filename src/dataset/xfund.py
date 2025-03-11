@@ -23,9 +23,22 @@ class XFUND(Dataset):
     ) -> None:
         super().__init__(config)
 
-    def download(self):
-        super().download()
+    def _download(self):
 
+        # download images
+        for split in ["train", "val"]:
+            folder = "train" if split == "train" else "test"
+            response = requests.get(f"{self.config[self._current]}{split}.zip")
+            zip_fn = self.config[self._current].split("/")[-1]
+            current_path = f"{self.path()}/{zip_fn}{split}.zip"
+            with open(current_path,"wb") as f:
+                f.write(response.content)
+
+            with zipfile.ZipFile(current_path, "r") as zip_ref:
+                zip_ref.extractall(os.path.join(self.path(), f"{folder}/images"))
+
+            os.remove(current_path)
+        
         # download and extraction of annotations
         for split in ["train", "val"]:
             folder = "train" if split == "train" else "test"
@@ -38,24 +51,12 @@ class XFUND(Dataset):
                 # contains 'fname', 'width' and 'height'
                 fname:str = element["img"]["fname"]
 
-                file = open(f"{self.path()}/{folder}/{fname.split('.')[0]}.txt", "w")
+                filename = fname.split('.')[0]
+                file_path = os.path.join(self.path(), folder, "labels", f"{filename}.txt")
+                file = open(file_path, "w")
                 file_content = []
                 for labels in document:
                     for word in labels["words"]:
                         file_content.append(f"{word['text']}\t{word['box']}\n")
                 file.writelines(file_content)
                 file.close()
-
-        # download images
-        for split in ["train", "val"]:
-            folder = "train" if split == "train" else "test"
-            response = requests.get(f"{self.config[self._current]}{split}.zip")
-            zip_fn = self.config[self._current].split("/")[-1]
-            current_path = f"{self.path()}/{zip_fn}{split}.zip"
-            with open(current_path,"wb") as f:
-                f.write(response.content)
-
-            with zipfile.ZipFile(current_path, "r") as zip_ref:
-                zip_ref.extractall(os.path.join(self.path(), "images"))
-
-            os.remove(current_path)
