@@ -1,27 +1,23 @@
 from abc import ABC, abstractmethod
-from PIL import Image, ImageDraw
+from ..utils import utils
+import cv2
 import os
 import ast
 
 
 class Dataset(ABC):
-    '''
-    self.config: configuration file
-    self.sub_datasets: list of sub-datasets if it's a type 2 dataset
-    self._current: specific name of the dataset
-    '''
     def __init__(
         self,
         config:dict
     ) -> None:
         super().__init__()
-        self.config:dict = config
+        self.config: dict = config
 
         # to manage multiple sub datasets
         self.sub_datasets:list = []
         if not(len(self.config.keys()) == 1 and self._root_name() in self.config.keys() or len(self.config.keys()) == 0):
             self.sub_datasets = list(self.config.keys())
-            self._current = self.sub_datasets[0]
+            self._current = self.sub_datasets[0] # default value
         else:
             self._current = self._root_name()
 
@@ -60,94 +56,98 @@ class Dataset(ABC):
         return os.path.exists(self.path())
     
     def check_images(
-        self
+        self,
+        errors: dict
     ) -> None:
-        img_dir = list(map(lambda img: img.split(".")[0], sorted(os.listdir(f"{self.path()}/images"))))
-        train_dir = list(map(lambda img: img.split(".")[0], sorted(os.listdir(f"{self.path()}/train"))))
-        test_dir = list(map(lambda img: img.split(".")[0], sorted(os.listdir(f"{self.path()}/test"))))
+        for split in ["train", "test"]:
+            images_dir = set(map(lambda fn: fn.split(".")[0], sorted(os.listdir(os.path.join(self.path(), split, "images")))))
+            labels_dir = set(map(lambda fn: fn.split(".")[0], sorted(os.listdir(os.path.join(self.path(), split, "labels")))))
 
-        label_dir = train_dir + test_dir
-        for label in label_dir:
-            if label not in img_dir:
-                raise Exception(f"Missing image for {label}.txt")
-            break
+            missing_labels = images_dir - labels_dir
+            if not(images_dir - labels_dir):
+                errors["missing_labels"] = list(missing_labels)
+
+            missing_images = labels_dir - images_dir
+            if not(labels_dir - images_dir):
+                errors["missing_images"] = list(missing_images)
     
     def check_labels(
         self,
         errors: dict
     ) -> None:
         for split in ["train", "test"]:
-            label_dir = sorted(os.listdir(f"{self.path()}/{split}"))
-        
-            for label in label_dir:
-                with open(os.path.join(self.path(), split, label), "r") as file:
-                    for i, row in enumerate(file.readlines()):
-                        text, bbox = row.split("\t")
-                        x1, y1, x2, y2 = tuple(ast.literal_eval(bbox))
-                        if not(x1 < x2 and y1 < y2):
-                            errors[f"{self._current}/{split}/{label}"] = dict(
-                                line = i + 1,
-                                text = text,
-                                bbox = [x1, y1, x2, y2]
-                            )
+            label_dir = sorted(os.listdir(os.path.join(self.path(), split, "labels")))
 
-    def adjust_label_name(self):
-        if len(self.config.keys()) > 0:
-            path = self.path()
-        
-            ext_dict = {}
-            img_dir = sorted(os.listdir(f"{path}/images"))
-            for img_fn in img_dir:
-                fn, ext = tuple(img_fn.split("."))
-                ext_dict[fn] = ext
-
-            for split in ["train", "test"]:
-                for label_fn in sorted(os.listdir(f"{path}/{split}")):
-                    fn, _ = tuple(label_fn.split("."))
-                    os.rename(
-                        f"{path}/{split}/{label_fn}",
-                        f"{path}/{split}/{fn}.{ext_dict[fn]}.txt"
-                    )
+            labels_content = utils.read_labels(label_dir)
+            for label_filename in labels_content.keys():
+                for i, (text, bbox) in enumerate(labels_content[label_filename]):
+                    x1, y1, x2, y2 = tuple(ast.literal_eval(bbox))
+                    if not(x1 < x2 and y1 < y2):
+                        errors[f"{self._current}/{split}/labels/{label_filename}"] = dict(
+                            line = i + 1,
+                            text = text,
+                            bbox = [x1, y1, x2, y2]
+                        )
 
     def draw_labels(self,
-        outline: str = "black",
-        fill: str | None = None,
-        width: int = 1
+        color: tuple[int] = (0, 0, 0),
+        thickness: int = 1
     ) -> None:
         os.makedirs(os.path.join(self.path(),"draw"), exist_ok=True)
 
         print(f"Draw labels for {self._current}")
 
         for split in ["train", "test"]:
-            os.makedirs(os.path.join(self.path(),"draw", split), exist_ok=True)
-            for file in os.listdir(os.path.join(self.path(),split)):
-                file_path = os.path.join(self.path(), split, file)
+            label_dir = os.path.join(self.path(), split, "labels")
+            img_dir = os.path.join(self.path(), split, "images")
+            output_dir = os.path.join(self.path(), "draw", split)
+            os.makedirs(output_dir, exist_ok=True)
 
-                bbox_list = []
-                with open(file_path, "r") as label:
-                    for row in label.readlines():
-                        _, bbox = row.split("\t")
-                        bbox_list.append(ast.literal_eval(bbox))
-                
-                img_name = file_path.split("/")[-1].replace(".txt","")
+            labels_content = utils.read_labels(label_dir)
+            for label_filename in labels_content.keys():
+                img_name = label_filename.strip(".txt")
+                img = cv2.imread(os.path.join(img_dir, img_name))
+                for (_, bbox) in labels_content[label_filename]:
+                    img = cv2.rectangle(
+                        img = img,
+                        pt1 = (bbox[0], bbox[1]),
+                        pt2 = (bbox[2], bbox[3]),
+                        color = color,
+                        thickness = thickness
+                    )
+                cv2.imwrite(os.path.join(output_dir, img_name), img)
 
-                img = Image.open(f"{self.path()}/images/{img_name}")
-                draw = ImageDraw.Draw(img)
-                for bbox in bbox_list:
-                    draw.rectangle(bbox, fill, outline, width)
-                img.save(f"{self.path()}/draw/{split}/{img_name}")
+    def download(self) -> None:
+        # create folders
+        path = self.path()
+        os.makedirs(path, exist_ok=True)
+        for split in ["train", "test"]:
+            os.makedirs(f"{path}/{split}", exist_ok=True)
+            for folder in ["images", "labels"]:
+                os.makedirs(f"{path}/{split}/{folder}", exist_ok=True)
+
+        self._download()
+        self._adjust_label_name()
+
+    def _adjust_label_name(self):
+        if len(self.config.keys()) > 0:
+            path = self.path()
+        
+            ext_dict = {}
+            for split in ["train", "test"]:
+                folder_path = os.path.join(path, split)
+                img_dir = sorted(os.listdir(os.path.join(folder_path, "images")))
+                for img_fn in img_dir:
+                    fn, ext = tuple(img_fn.split("."))
+                    ext_dict[fn] = ext
+
+                for label_fn in sorted(os.listdir(os.path.join(folder_path, "labels"))):
+                    fn, _ = tuple(label_fn.split("."))
+                    os.rename(
+                        os.path.join(folder_path, "labels", label_fn),
+                        os.path.join(folder_path, "labels", f"{fn}.{ext_dict[fn]}.txt")
+                    )
 
     @abstractmethod
-    def download(
-        self
-    ) -> None:
-        '''
-        Download images and labels for `current` dataset
-        '''
-
-        path = self.path()
-
-        os.makedirs(path, exist_ok=True)
-        os.makedirs(f"{path}/train", exist_ok=True)
-        os.makedirs(f"{path}/test", exist_ok=True)
-        os.makedirs(f"{path}/images", exist_ok=True)
+    def _download(self) -> None:
+        pass
