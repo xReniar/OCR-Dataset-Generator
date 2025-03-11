@@ -12,5 +12,5 @@ class IAM(Dataset):
     ) -> None:
         super().__init__(config)
 
-    def download(self):
-        super().download()
+    def _download(self):
+        pass
