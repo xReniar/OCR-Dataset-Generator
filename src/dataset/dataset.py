@@ -64,11 +64,11 @@ class Dataset(ABC):
             labels_dir = set(map(lambda fn: fn.split(".")[0], sorted(os.listdir(os.path.join(self.path(), split, "labels")))))
 
             missing_labels = images_dir - labels_dir
-            if not(images_dir - labels_dir):
+            if not(missing_labels):
                 errors["missing_labels"] = list(missing_labels)
 
             missing_images = labels_dir - images_dir
-            if not(labels_dir - images_dir):
+            if not(missing_images):
                 errors["missing_images"] = list(missing_images)
     
     def check_labels(
