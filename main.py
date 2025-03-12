@@ -1,5 +1,6 @@
-from src.dataset import DATASETS, CONFIG, Dataset
+from src.dataset import DATASETS, CONFIG
 from src.generator import *
+from src.utils.draw import draw_labels
 import json
 import yaml
 import argparse
@@ -18,30 +19,30 @@ def main(
     for dataset in datasets.keys():
         if "-" in dataset:
             root:str = dataset.split("-")[0].upper()
-            dataset_instance:Dataset = DATASETS[root](CONFIG[root])
+            dataset_instance = DATASETS[root](CONFIG[root])
             dataset_instance.set_subdataset(dataset)
             datasets[dataset] = dataset_instance
         else:
             datasets[dataset] = DATASETS[dataset.upper()](CONFIG[dataset.upper()])
         
         # download if necessary
-        dataset_instance: Dataset = datasets[dataset]
+        dataset_instance = datasets[dataset]
         if not(dataset_instance.is_downloaded()):
+            print(f"Downloading {dataset_instance.path()}")
             dataset_instance.download()
-            dataset_instance.adjust_label_name()
+            print(f"Downloaded {dataset_instance.path()}")
 
     # check if all the labels have a corresponding image
     # also check if there are wrong bounding boxes
     errors = {}
     for dataset in datasets.keys():
-        dataset_instance: Dataset = datasets[dataset]
-        dataset_instance.check_images()
-        dataset_instance.check_labels(errors)
+        dataset_instance = datasets[dataset]
 
     if args.draw:
         for dataset in datasets.keys():
-            dataset_instance: Dataset = datasets[dataset]
-            dataset_instance.draw_labels()
+            dataset_instance = datasets[dataset]
+            draw_labels(dataset_instance.path())
+            
     
     if args.generate:
         if not(len(list(errors.keys())) != 0):
@@ -71,7 +72,7 @@ def parse_args():
     return args
 
 if __name__ == "__main__":
-    datasets_config: dict = yaml.safe_load(open("./config/dataset.yaml", "r"))
+    datasets_config: dict = yaml.safe_load(open("./config/pipeline.yaml", "r"))
     augmentation_config: dict = yaml.safe_load(open("./config/augmentation.yaml", "r"))
 
     TASKS: dict = datasets_config["tasks"]
