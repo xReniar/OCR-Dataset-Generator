@@ -23,7 +23,9 @@ def draw_labels(
                 label_filename,
                 labels_content[label_filename],
                 img_dir,
-                output_dir
+                output_dir,
+                (0, 0, 0),
+                1
             ))
 
     # start multiprocessing
@@ -37,7 +39,9 @@ def draw_single_img(
     label_filename: str,
     label_data: str,
     img_dir: str,
-    output_dir: str
+    output_dir: str,
+    color: tuple,
+    thickness: int
 ) -> None:
     img_name = label_filename.strip(".txt")
     
@@ -48,8 +52,8 @@ def draw_single_img(
             img = img,
             pt1 = (bbox[0], bbox[1]),
             pt2 = (bbox[2], bbox[3]),
-            color = (0, 0, 0),
-            thickness = 1
+            color = color,
+            thickness = thickness
         )
 
     cv2.imwrite(os.path.join(output_dir, img_name), img)
