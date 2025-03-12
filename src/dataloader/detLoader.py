@@ -1,6 +1,6 @@
 from .dataloader import Dataloader
-from ..utils import reader
 import multiprocessing
+import ast
 import os
 
 class DetDataloader(Dataloader):
@@ -14,39 +14,38 @@ class DetDataloader(Dataloader):
             datasets
         )
 
-    def _load_data(self) -> None:
-
-        '''
+    def _load_data(
+        self
+    ) -> None:
         for split in ["train", "test"]:
-            all_tasks = []
-            for dataset in self._datasets:
-                all_tasks.append((
-                    dataset,
-                    split
-                ))
-            pool = multiprocessing.Pool(processes=4)
-            
-            # image_path -> list[str, list[int]]
-            curr_list = pool.starmap(self.__loader__, all_tasks)
-            pool.close()
-            pool.join()
-            
-            self.data[split] = curr_list
-        '''
+            root_paths = [os.path.join("data", dataset, split, "labels") for dataset in self._datasets]
+
+            full_paths = []
+            for path in root_paths:
+                full_paths += [os.path.join(path, fn) for fn in os.listdir(path)]
+
+            self.data[split] = self.__loader__(full_paths)
 
     def __loader__(
         self,
-        dataset: str,
-        split: str
-    ) -> None:
-        split_folder_path = os.path.join("data", dataset, split, "images")
-        content = reader.read_labels(split_folder_path)
-        curr_list = []
-        for label_name in content.keys():
-            img_name = label_name.strip(".txt")
-            curr_list.append((
-                os.path.join(split_folder_path, img_name),
-                content[label_name]
-            ))
+        label_dir_paths: str 
+    ) -> list[tuple[str, list[tuple[str, list[int]]]]]:
+        pool = multiprocessing.Pool(processes=os.cpu_count())
+        labels = pool.map(self.label_info, label_dir_paths)
 
-        return curr_list
+        pool.close()
+        pool.join()
+
+        return labels
+    
+    @staticmethod
+    def label_info(
+        label_path: str
+    ) -> tuple[str, list[tuple[str, list[int]]]]:
+        with open(label_path, "r") as label_file:
+            label_content = []
+            rows = list(map(lambda row: row.strip("\n").split("\t"), label_file.readlines()))
+            for (text, bbox) in rows:
+                label_content.append((text, ast.literal_eval(bbox)))
+        
+            return (label_path.strip(".txt").replace("labels", "images"), label_content)
