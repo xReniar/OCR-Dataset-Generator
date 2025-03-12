@@ -1,4 +1,6 @@
 from .dataloader import Dataloader
+from ..utils import reader
+import multiprocessing
 import os
 
 class DetDataloader(Dataloader):
@@ -13,17 +15,38 @@ class DetDataloader(Dataloader):
         )
 
     def _load_data(self) -> None:
-        for dataset in sorted(self.datasets):
-            self.data[dataset] = dict(
-                train=[],
-                test=[]
-            )
-            for split in ["train", "test"]:
-                curr_list = []
-                split_folder_path = f"./data/{dataset}/{split}"
-                for label_fn in sorted(os.listdir(split_folder_path)):
-                    img_fn = label_fn.replace(".txt","")
-                    curr_list.append({
-                        f"{img_fn}": list(map(lambda x: x[1],self.read_label(f"{split_folder_path}/{label_fn}")))
-                    })
-                self.data[dataset][split] = curr_list
+
+        '''
+        for split in ["train", "test"]:
+            all_tasks = []
+            for dataset in self._datasets:
+                all_tasks.append((
+                    dataset,
+                    split
+                ))
+            pool = multiprocessing.Pool(processes=4)
+            
+            # image_path -> list[str, list[int]]
+            curr_list = pool.starmap(self.__loader__, all_tasks)
+            pool.close()
+            pool.join()
+            
+            self.data[split] = curr_list
+        '''
+
+    def __loader__(
+        self,
+        dataset: str,
+        split: str
+    ) -> None:
+        split_folder_path = os.path.join("data", dataset, split, "images")
+        content = reader.read_labels(split_folder_path)
+        curr_list = []
+        for label_name in content.keys():
+            img_name = label_name.strip(".txt")
+            curr_list.append((
+                os.path.join(split_folder_path, img_name),
+                content[label_name]
+            ))
+
+        return curr_list
