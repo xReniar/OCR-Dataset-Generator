@@ -75,10 +75,13 @@ class Generator(ABC):
 
         if tasks["det"] == "y":
             detLoader = DetDataloader(self.transforms["detection"], self.datasets)
+            tr = len(detLoader.data["train"])
+            te = len(detLoader.data["test"])
+            print(tr, te)
             self._generate_det_data(detLoader)
         if tasks["rec"] == "y":
             recLoader = RecDataloader(self.transforms["recognition"], self.datasets)
-            self._generate_rec_data(recLoader)
+            #self._generate_rec_data(recLoader)
 
 
     @abstractmethod
