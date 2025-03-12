@@ -13,6 +13,7 @@ class RecDataloader(Dataloader):
         )
 
     def _load_data(self) -> None:
+        '''
         for dataset in sorted(self.datasets):
             self.data[dataset] = dict(
                 train=[],
@@ -28,3 +29,5 @@ class RecDataloader(Dataloader):
                             f"{img_fn}-{i}.{img_type}": [bbox,text]
                         })
                 self.data[dataset][split] = curr_list
+        '''
+        pass
