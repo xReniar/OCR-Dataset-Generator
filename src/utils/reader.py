@@ -13,7 +13,9 @@ def read_label(
     
     return label_content
 
-def read_labels(label_dir_path:str) -> dict[str, list[tuple[str, list[int]]]]:
+def read_labels(
+    label_dir_path:str
+) -> dict[str, list[tuple[str, list[int]]]]:
     labels_content = {}
     for label_filename in os.listdir(label_dir_path):
         labels_content[label_filename] = read_label(os.path.join(label_dir_path, label_filename))
