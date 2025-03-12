@@ -5,7 +5,6 @@ import shutil
 import json
 import os
 
-
 CONFIG = {
     "funsd": "https://guillaumejaume.github.io/FUNSD/dataset.zip"
 }
@@ -49,7 +48,7 @@ class FUNSD(Dataset):
             for annotation_file in os.listdir(src_folder):
                 file_path = os.path.join(dst_folder, annotation_file.replace("json", "txt"))
                 file = open(file_path,"w")
-                annotation:list = json.load(os.path.join(src_folder, annotation_file), "r")["form"]
+                annotation:list = json.load(open(os.path.join(src_folder, annotation_file), "r"))["form"]
                 
                 file_content = []
                 for label in annotation:
