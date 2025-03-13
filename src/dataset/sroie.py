@@ -1,16 +1,16 @@
 from .dataset import Dataset
-from datasets import load_dataset
 import cv2
+import multiprocessing
+import requests
 import gdown
 import zipfile
 import os
 import shutil
 
-
 CONFIG = {
     "sroie": [
         "https://drive.google.com/uc?id=1ZyxAw1d-9UvhgNLGRvsJK4gBCMf0VpGD",
-        "darentang/sroie"
+        "https://datasets-server.huggingface.co/rows?dataset=darentang%2Fsroie&config=sroie"
     ]
 }
 
@@ -31,6 +31,32 @@ class SROIE(Dataset):
             int(width * bbox[2] / 1000),
             int(height * bbox[3] / 1000),
         ]
+    
+    def process_data(
+        self,
+        base_url: str,
+        split: str,
+        offset: str
+    ) -> None:
+        response = requests.get(f"{base_url}&split={split}&offset={offset}&length=100")
+        json_response = response.json()
+
+        current_path = os.path.join("data", "sroie", split)
+
+        for row in json_response["rows"]:
+            instance = row["row"]
+
+            words: str = instance["words"]
+            bboxes: list[int] = instance["bboxes"]
+            img_name: str = instance["image_path"].split("/")[-1]
+            img_id, _ = tuple(img_name.split("."))
+            img_path = os.path.join(current_path, "images", img_name)
+
+            with open(os.path.join(current_path, "labels", f"{img_id}.txt"), "w") as file:
+                lines = []
+                for (word, bbox) in list(zip(words, bboxes)):
+                    lines.append(f"{word}\t{self.get_original_bbox(bbox, img_path)}\n")
+                file.writelines(lines)
 
     def _download(self):
         # download images
@@ -54,21 +80,21 @@ class SROIE(Dataset):
         shutil.rmtree(os.path.join(self.path(), "sroie"))
 
         # download labels
-        for split in ["train", "test"]:
-            for sample in load_dataset(self.config[self._current][1], split=split):
-                words = sample["words"]
-                bboxes = sample["bboxes"]
-                #ner_tags = sample["ner_tags"]
-                image_path:str = sample["image_path"]
-
-                image_name = image_path.split("/")[-1]
-                file_name = image_name.replace(".jpg", ".txt")
-
-                file = open(os.path.join(self.path(), split, "labels", file_name),"w")
-                file_content = []
-                for word, bbox in zip(words, bboxes):
-                    img_path = os.path.join(self.path(), split, "images", image_name)
-                    bbox = self.get_original_bbox(bbox, img_path=img_path)
-                    file_content.append(f"{word}\t{bbox}\n")
-                file.writelines(file_content)
-                file.close()
+        size = {
+            "train": 626,
+            "test": 347
+        }
+        for split in size.keys():
+            offset = 0
+            args = []
+            while offset < size[split]:
+                args.append((
+                    self.config[self._current][1],
+                    split,
+                    offset
+                ))
+                offset += 100
+            pool = multiprocessing.Pool(processes=4)
+            _ = pool.starmap(self.process_data, args)
+            pool.close()
+            pool.join()
