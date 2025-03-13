@@ -1,7 +1,7 @@
 from .dataset import Dataset
+from datasets import load_dataset
 import cv2
 import multiprocessing
-import requests
 import gdown
 import zipfile
 import os
@@ -10,7 +10,7 @@ import shutil
 CONFIG = {
     "sroie": [
         "https://drive.google.com/uc?id=1ZyxAw1d-9UvhgNLGRvsJK4gBCMf0VpGD",
-        "https://datasets-server.huggingface.co/rows?dataset=darentang%2Fsroie&config=sroie"
+        "darentang/sroie"
     ]
 }
 
@@ -69,25 +69,18 @@ class SROIE(Dataset):
         os.remove(zip_path)
         shutil.rmtree(os.path.join(self.path(), "__MACOSX"))
         shutil.rmtree(os.path.join(self.path(), "sroie"))
-
+        
         # download labels
-        size = { "train": 626, "test": 347 }
-        responses = []
-        for split in size.keys():
-            offset = 0
-            while offset < size[split]:
-                responses.append(requests.get(f"{self.config[self._current][1]}&split={split}&offset={offset}&length=100").json())
-                offset += 100
         data = []
-        for response in responses:
-            for row in response["rows"]:
-                instance = row["row"]
+        for split in ["train", "test"]:
+            for sample in load_dataset(self.config[self._current][1], split=split):
+                image_path = sample["image_path"]
 
                 data.append((
-                    instance["words"],
-                    instance["bboxes"],
-                    instance["image_path"].split("/")[-1],
-                    instance["image_path"].split("/")[-3]
+                    sample["words"],
+                    sample["bboxes"],
+                    image_path.split("/")[-1],
+                    image_path.split("/")[-3]
                 ))
 
         pool = multiprocessing.Pool(processes=os.cpu_count())
