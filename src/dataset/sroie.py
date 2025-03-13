@@ -34,29 +34,19 @@ class SROIE(Dataset):
     
     def process_data(
         self,
-        base_url: str,
-        split: str,
-        offset: str
+        words: str,
+        bboxes: list[int],
+        img_name: str,
+        split: str
     ) -> None:
-        response = requests.get(f"{base_url}&split={split}&offset={offset}&length=100")
-        json_response = response.json()
-
         current_path = os.path.join("data", "sroie", split)
-
-        for row in json_response["rows"]:
-            instance = row["row"]
-
-            words: str = instance["words"]
-            bboxes: list[int] = instance["bboxes"]
-            img_name: str = instance["image_path"].split("/")[-1]
-            img_id, _ = tuple(img_name.split("."))
+        img_id, _ = tuple(img_name.split(".")) 
+        with open(os.path.join(current_path, "labels", f"{img_id}.txt"), "w") as file:
             img_path = os.path.join(current_path, "images", img_name)
-
-            with open(os.path.join(current_path, "labels", f"{img_id}.txt"), "w") as file:
-                lines = []
-                for (word, bbox) in list(zip(words, bboxes)):
-                    lines.append(f"{word}\t{self.get_original_bbox(bbox, img_path)}\n")
-                file.writelines(lines)
+            lines = []
+            for (word, bbox) in list(zip(words, bboxes)):
+                lines.append(f"{word}\t{self.get_original_bbox(bbox, img_path)}\n")
+            file.writelines(lines)
 
     def _download(self):
         # download images
@@ -80,22 +70,26 @@ class SROIE(Dataset):
         shutil.rmtree(os.path.join(self.path(), "sroie"))
 
         # download labels
-        size = {
-            "train": 626,
-            "test": 347
-        }
-        args = []
+        size = { "train": 626, "test": 347 }
+        responses = []
         for split in size.keys():
             offset = 0
             while offset < size[split]:
-                args.append((
-                    self.config[self._current][1],
-                    split,
-                    offset
-                ))
+                responses.append(requests.get(f"{self.config[self._current][1]}&split={split}&offset={offset}&length=100").json())
                 offset += 100
+        data = []
+        for response in responses:
+            for row in response["rows"]:
+                instance = row["row"]
+
+                data.append((
+                    instance["words"],
+                    instance["bboxes"],
+                    instance["image_path"].split("/")[-1],
+                    instance["image_path"].split("/")[-3]
+                ))
 
         pool = multiprocessing.Pool(processes=os.cpu_count())
-        _ = pool.starmap(self.process_data, args)
+        _ = pool.starmap(self.process_data, data)
         pool.close()
         pool.join()
