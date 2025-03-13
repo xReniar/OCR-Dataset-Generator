@@ -84,9 +84,9 @@ class SROIE(Dataset):
             "train": 626,
             "test": 347
         }
+        args = []
         for split in size.keys():
             offset = 0
-            args = []
             while offset < size[split]:
                 args.append((
                     self.config[self._current][1],
@@ -94,7 +94,8 @@ class SROIE(Dataset):
                     offset
                 ))
                 offset += 100
-            pool = multiprocessing.Pool(processes=4)
-            _ = pool.starmap(self.process_data, args)
-            pool.close()
-            pool.join()
+
+        pool = multiprocessing.Pool(processes=os.cpu_count())
+        _ = pool.starmap(self.process_data, args)
+        pool.close()
+        pool.join()
