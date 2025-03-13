@@ -22,9 +22,8 @@ class SROIE(Dataset):
     ) -> None:
         super().__init__(config)
 
-    def get_original_bbox(self, bbox, img_path:str):
-        img = cv2.imread(img_path)
-        width, height = img.shape[1], img.shape[0]
+    def get_original_bbox(self, bbox, img_size:tuple):
+        width, height = img_size
         return [
             int(width * bbox[0] / 1000),
             int(height * bbox[1] / 1000),
@@ -43,9 +42,11 @@ class SROIE(Dataset):
         img_id, _ = tuple(img_name.split(".")) 
         with open(os.path.join(current_path, "labels", f"{img_id}.txt"), "w") as file:
             img_path = os.path.join(current_path, "images", img_name)
+            img = cv2.imread(img_path)
+
             lines = []
             for (word, bbox) in list(zip(words, bboxes)):
-                lines.append(f"{word}\t{self.get_original_bbox(bbox, img_path)}\n")
+                lines.append(f"{word}\t{self.get_original_bbox(bbox, (img.shape[1], img.shape[0]))}\n")
             file.writelines(lines)
 
     def _download(self):
