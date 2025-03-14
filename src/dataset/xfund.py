@@ -30,12 +30,12 @@ class XFUND(Dataset):
             folder = "train" if split == "train" else "test"
             response = requests.get(f"{self.config[self._current]}{split}.zip")
             zip_fn = self.config[self._current].split("/")[-1]
-            current_path = f"{self.path()}/{zip_fn}{split}.zip"
+            current_path = os.path.join(self.path(), f"{zip_fn}{split}.zip")
             with open(current_path,"wb") as f:
                 f.write(response.content)
 
             with zipfile.ZipFile(current_path, "r") as zip_ref:
-                zip_ref.extractall(os.path.join(self.path(), f"{folder}/images"))
+                zip_ref.extractall(os.path.join(self.path(), folder, "images"))
 
             os.remove(current_path)
         

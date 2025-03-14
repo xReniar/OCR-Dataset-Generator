@@ -19,10 +19,10 @@ class FUNSD(Dataset):
     def _download(self) -> None:
         response = requests.get(self.config[self._current])
         zip_fn = self.config[self._current].split("/")[-1]
-        with open(f"{self.path()}/{zip_fn}","wb") as f:
+        zip_path = os.path.join(self.path(), zip_fn)
+        with open(zip_path,"wb") as f:
             f.write(response.content)
 
-        zip_path = os.path.join(self.path(), zip_fn)
         with zipfile.ZipFile(zip_path, "r") as zip_ref:
             zip_ref.extractall(self.path())
 
