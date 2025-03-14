@@ -1,7 +1,7 @@
 from .generator import Generator
-from ..dataloader.detLoader import DetDataloader
-from ..dataloader.recLoader import RecDataloader
-from PIL import Image
+from ..dataloader import Dataloader
+import multiprocessing
+import cv2
 import hashlib
 import json
 import os
@@ -20,62 +20,74 @@ class DoctrGenerator(Generator):
             transforms
         )
 
-    def _generate_det_data(self, dataloader: DetDataloader):
-        root_path = os.path.join(self.root_path, "Detection")
+    def _generate(
+        self,
+        dataloader: Dataloader,
+        task: str,
+        process,
+    ) -> None:
+        root_path = os.path.join(self.root_path, task)
         os.makedirs(root_path, exist_ok=True)
+
+        for split in ["train", "test"]:
+            img_output_path = os.path.join(root_path, split, "images")
+            os.makedirs(img_output_path, exist_ok=True)
+
+            args = [(img_output_path, img_path, gt) for (img_path, gt) in dataloader.data[split]]
+
+            with multiprocessing.Pool(processes=os.cpu_count()) as pool:
+                results = pool.starmap(process, args)
+
+            with open(os.path.join(root_path, split, "labels.json"),"w") as file:
+                labels = {}
+                if task == "Recognition":
+                    results = [item for sublist in results for item in sublist]
+                for (img_name, label) in results:
+                    labels[img_name] = label
+                json.dump(labels, file, indent=4, ensure_ascii=False)
+
+    def _det(
+        self,
+        img_output_path: str,
+        img_path: str,
+        gt: list
+    ) -> tuple[str, dict]:
+        img = cv2.imread(img_path)
+        _, img_name = os.path.split(img_path)
+
+        polygons = []
+        for (_, bbox) in gt:
+            x1, y1, x2, y2 = tuple(bbox)
+            polygons.append([[x1, y1],[x1, y2],[x2, y2],[x2, y1]])
+
+        cv2.imwrite(os.path.join(img_output_path, img_name), img)
+        result = (
+            img_name,
+            dict(
+                img_dimensions = (img.shape[1], img.shape[0]),
+                img_hash = hashlib.sha256(img).hexdigest(),
+                polygons = polygons
+            )
+        )
+
+        return result
+    
+    def _rec(
+        self,
+        img_output_path: str,
+        img_path: str,
+        gt: list
+    ) -> list[tuple[str, str]]:
+        img = cv2.imread(img_path)
+
+        _, img_name = os.path.split(img_path)
+
+        result = []
+        for i, (text, bbox) in enumerate(gt):
+            crop = img[bbox[1]:bbox[3], bbox[0]:bbox[2]]
+            crop_name = img_name.replace(".", f"-{i}.")
+            cv2.imwrite(os.path.join(img_output_path, crop_name), crop)
+
+            result.append((crop_name, text))
         
-        for split in ["train", "test"]:
-            labels = {}
-            os.makedirs(f"{root_path}/{split}/images", exist_ok=True)
-            for dataset in self.datasets:
-                current_path = f"data/{dataset}"
-
-                label_dir = sorted(os.listdir(f"{current_path}/{split}"))
-
-                # images creations
-                self.copy_file(
-                    label_dir,
-                    current_path,
-                    f"{root_path}/{split}/images",
-                )
-
-                # labels creation
-                for label in label_dir:
-                    img_name = label.replace(".txt","")
-
-                    # creating label instance for labels.json
-                    img = Image.open(f"{current_path}/images/{img_name}")
-                    polygons = []
-                    for (_, bbox) in self.read_rows(f"{current_path}/{split}/{label}"):
-                        x1, y1, x2, y2 = bbox
-                        polygons.append([[x1, y1],[x2, y1],[x2, y2],[x1, y2]])
-                    labels[f"{img_name}"] = dict(
-                        img_dimensions = (img.width, img.height),
-                        img_hash = hashlib.sha256(img.tobytes()).hexdigest(),
-                        polygons = polygons
-                    )
-                    img.close()
-            with open(f"{root_path}/{split}/labels.json","w") as file:
-                json.dump(labels,file, indent=4)
-
-    def _generate_rec_data(self, dataloader: RecDataloader):
-        root_path = os.path.join(self.root_path, "Recognition")
-        os.makedirs(root_path, exist_ok=True)
-
-        for split in ["train", "test"]:
-            labels = {}
-            os.makedirs(f"{root_path}/{split}/images", exist_ok=True)
-            for dataset in self.datasets:
-                current_path = f"data/{dataset}"
-
-                for label in sorted(os.listdir(f"{current_path}/{split}")):
-                    img_fn = label.replace(".txt", "")
-                    img = Image.open(f"{current_path}/images/{img_fn}")
-                    for index, (text, bbox) in enumerate(self.read_rows(f"{current_path}/{split}/{label}")):
-                        crop_name = img_fn.replace(".",f"-{index}.")
-                        img.crop(bbox).save(f"{root_path}/{split}/images/{crop_name}")
-                        labels[crop_name] = text
-                    img.close()
-
-            with open(f"{root_path}/{split}/labels.json","w") as file:
-                json.dump(labels,file, indent=4, ensure_ascii=False)
+        return result
