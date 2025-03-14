@@ -83,7 +83,5 @@ class SROIE(Dataset):
                     image_path.split("/")[-3]
                 ))
 
-        pool = multiprocessing.Pool(processes=os.cpu_count())
-        _ = pool.starmap(self.process_data, data)
-        pool.close()
-        pool.join()
+        with multiprocessing.Pool(processes=os.cpu_count()) as pool:
+            pool.starmap(self.process_data, data)
