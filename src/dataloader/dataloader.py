@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import os
 
 
 class Dataloader(ABC):
@@ -15,9 +16,14 @@ class Dataloader(ABC):
             train = [],
             test = []
         )
-
+        self._workers = os.cpu_count()
+        
         self._load_data()
 
     @abstractmethod
     def _load_data(self):
+        pass
+
+    @abstractmethod
+    def _filter(self):
         pass
