@@ -29,11 +29,8 @@ def draw_labels(
             ))
 
     # start multiprocessing
-    pool = multiprocessing.Pool(processes=4)
-    pool.starmap(draw_single_img, all_tasks)
-    
-    pool.close()
-    pool.join()
+    with multiprocessing.Pool(processes=os.cpu_count()) as pool:
+        pool.starmap(draw_single_img, all_tasks)
 
 def draw_single_img(
     label_filename: str,
