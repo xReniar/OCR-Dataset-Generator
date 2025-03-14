@@ -26,7 +26,7 @@ def main(
             datasets[dataset] = DATASETS[dataset.upper()](CONFIG[dataset.upper()])
         
         # download if necessary
-        dataset_instance = datasets[dataset]
+        dataset_instance = datasets[dataset]      
         if not(dataset_instance.is_downloaded()):
             print(f"Downloading {dataset_instance.path()}")
             dataset_instance.download()
