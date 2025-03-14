@@ -25,7 +25,7 @@ class RecDataloader(Dataloader):
                 full_paths += [os.path.join(path, fn) for fn in os.listdir(path)]
 
             # get det data
-            pool = multiprocessing.Pool(processes = os.cpu_count())
+            pool = multiprocessing.Pool(processes = self._workers)
             data = pool.map(reader.read_label, full_paths)
             pool.close()
             pool.join()
@@ -33,7 +33,7 @@ class RecDataloader(Dataloader):
             # convert it to recog data
             args = [(img_path, text_box_list) for img_path, text_box_list in data]
 
-            rec_pool = multiprocessing.Pool(processes = os.cpu_count())
+            rec_pool = multiprocessing.Pool(processes = self._workers)
             rec_labels = rec_pool.starmap(self.__extract_rec_info__, args)
             rec_pool.close()
             rec_pool.join()
@@ -50,12 +50,9 @@ class RecDataloader(Dataloader):
         labels = []
         for i, (text, box) in enumerate(text_box_list):
             crop_name = img_name.replace(".", f"-{i}.")
-
-            labels.append((
-                crop_name,
-                text,
-                box,
-                filepath
-            ))
+            labels.append((crop_name,text,box,filepath))
 
         return labels
+    
+    def _filter(self):
+        pass

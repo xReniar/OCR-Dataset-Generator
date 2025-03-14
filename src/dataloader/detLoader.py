@@ -24,10 +24,13 @@ class DetDataloader(Dataloader):
             for path in root_paths:
                 full_paths += [os.path.join(path, fn) for fn in os.listdir(path)]
 
-            pool = multiprocessing.Pool(processes = os.cpu_count())
+            pool = multiprocessing.Pool(processes = self._workers)
             labels = pool.map(reader.read_label, full_paths)
 
             pool.close()
             pool.join()
 
             self.data[split] = labels
+    
+    def _filter(self):
+        pass
