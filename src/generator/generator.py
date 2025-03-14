@@ -1,10 +1,7 @@
 from abc import ABC, abstractmethod
-from multiprocessing import Process
-from ..dataloader.detLoader import DetDataloader
-from ..dataloader.recLoader import RecDataloader
-import shutil
+from ..dataloader import Dataloader
+import multiprocessing
 import os
-import ast
 
 
 class Generator(ABC):
@@ -13,7 +10,7 @@ class Generator(ABC):
     def __init__(
         self,
         test_name: str,
-        datasets : list,
+        datasets : list[str],
         transforms
     ) -> None:
         super().__init__()
@@ -23,7 +20,7 @@ class Generator(ABC):
             element = dataset
             if "-" in element:
                 dataset_root = dataset.split("-")[0]
-                element = f"{dataset_root}/{element}"
+                element = os.path.join(dataset_root, element)
             new_datasets.append(element)
 
         self.test_name = test_name
@@ -34,59 +31,29 @@ class Generator(ABC):
         self
     ) -> str:
         return self.__class__.__name__.lower().replace("generator","")
-    
-    def read_rows(
-        self,
-        label_filepath: str
-    ) -> list:
-        labels = []
-        label_file = open(label_filepath,"r")
-        for row in label_file.readlines():
-            text, bbox = row.split("\t")
-            labels.append((text, tuple(ast.literal_eval(bbox))))
-        label_file.close()
-        return labels
-    
-    def __copy_file(self, source, destination):
-        shutil.copy(source, destination)
-    
-    def copy_file(self, label_dir:list[str], src_path:str, dst_path:str):
-        args = []                
-        # image creation
-        for label in label_dir:
-            img_name = label.replace(".txt", "")
-            
-            src = f"{src_path}/images/{img_name}" 
-            dst = f"{dst_path}/{img_name}"
-            args.append((src, dst))
-        
-        processes = []
-        for src, dst in args:
-            process = Process(target=self.__copy_file, args=(src, dst))
-            processes.append(process)
-            process.start()
 
-        for process in processes:
-            process.join()
-
-    def generate_data(self, tasks:str):
-        self.root_path = f"{self.base_path}/{self.test_name}-{self.name()}"
+    def generate_data(self, tasks:dict):
+        self.root_path = os.path.join(self.base_path,f"{self.test_name}-{self.name()}")
         os.makedirs(self.root_path, exist_ok=True)
 
-        if tasks["det"] == "y":
-            detLoader = DetDataloader(self.transforms["detection"], self.datasets)
-            print(len(detLoader.data["train"]), len(detLoader.data["test"]))
-            #self._generate_det_data(detLoader)
-        if tasks["rec"] == "y":
-            recLoader = RecDataloader(self.transforms["recognition"], self.datasets)
-            print(len(recLoader.data["train"]), len(recLoader.data["test"]))
-            #self._generate_rec_data(recLoader)
+        dataloader = Dataloader(
+            self.transforms,
+            self.datasets
+        )
 
+        if tasks["det"] == "y":
+            self._generate(dataloader, "Detection", self._det)
+        if tasks["rec"] == "y":
+            self._generate(dataloader, "Recognition", self._rec)
 
     @abstractmethod
-    def _generate_det_data(self, dataloader: DetDataloader) -> None:
+    def _generate(self, dataloader: Dataloader, task: str, process) -> None:
+        pass
+
+    @abstractmethod
+    def _det(self, img_output_path: str, img_path: str, gt: list) -> None:
         pass
     
     @abstractmethod
-    def _generate_rec_data(self, dataloader: RecDataloader) -> None:
+    def _rec(self, img_output_path: str, img_path: str, gt: list) -> None:
         pass
