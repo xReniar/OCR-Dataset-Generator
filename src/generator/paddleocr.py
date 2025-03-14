@@ -1,7 +1,8 @@
 from .generator import Generator
-from ..dataloader.detLoader import DetDataloader
-from ..dataloader.recLoader import RecDataloader
-from PIL import Image
+from ..dataloader import Dataloader
+from pathlib import Path
+import multiprocessing
+import cv2
 import os
 import json
 
@@ -19,59 +20,67 @@ class PaddleOCRGenerator(Generator):
             transforms
         )
 
-    def _generate_det_data(self, dataloader: DetDataloader):
-        root_path = os.path.join(self.root_path, "Detection")
+    def _generate(
+        self,
+        dataloader: Dataloader,
+        task: str,
+        process,
+    ) -> None:
+        root_path = os.path.join(self.root_path, task)
         os.makedirs(root_path, exist_ok=True)
 
-        # images copy step
         for split in ["train", "test"]:
-            os.makedirs(os.path.join(root_path, split), exist_ok=True)
-            label_file = open(f"{root_path}/{split}_label.txt","w")
-            for dataset in self.datasets:
-                current_path = f"data/{dataset}"
+            img_output_path = os.path.join(root_path, split)
+            os.makedirs(img_output_path, exist_ok=True)
 
-                label_dir = sorted(os.listdir(f"{current_path}/{split}"))
+            args = [(img_output_path, img_path, gt) for (img_path, gt) in dataloader.data[split]]
 
-                self.copy_file(
-                    sorted(label_dir),
-                    current_path,
-                    f"{root_path}/{split}"
-                )
+            with multiprocessing.Pool(processes=os.cpu_count()) as pool:
+                results = pool.starmap(process, args)
 
-                label_content = []
-                # labels creation
-                for label in label_dir:
-                    img_name = label.replace(".txt","")
+            with open(os.path.join(root_path, f"{split}_label.txt"), "w") as file:
+                if task == "Recognition":
+                    results = [item for sublist in results for item in sublist]
+                    results = [f"{path}\t{text}\n" for (path, text) in results]
+                
+                file.writelines(results)
+                
+    def _det(
+        self,
+        img_output_path: str,
+        img_path: str,
+        gt: list
+    ) -> str:
+        img = cv2.imread(img_path)
+        _, img_name = os.path.split(img_path)
+        cv2.imwrite(os.path.join(img_output_path, img_name), img)
 
-                    annotations = []
-                    for (text, bbox) in self.read_rows(f"{current_path}/{split}/{label}"):
-                        x1, y1, x2, y2 = bbox
-                        annotations.append(dict(
-                            transcription=text,
-                            points = [[x1, y1],[x2, y1],[x2, y2],[x1, y2]]
-                        ))
-                    label_content.append(f"{split}/{img_name}\t{json.dumps(annotations, ensure_ascii=False)}\n")
-                label_file.writelines(label_content)
-            label_file.close()
+        split = Path(img_output_path).parts[-1]
+        annotations = {}
+        for (text, bbox) in gt:
+            x1, y1, x2, y2 = bbox
+            annotations = dict(
+                transcription=text,
+                points = [[x1, y1],[x2, y1],[x2, y2],[x1, y2]]
+            )
 
-    def _generate_rec_data(self, dataloader: RecDataloader):
-        root_path = os.path.join(self.root_path, "Recognition")
-        os.makedirs(root_path, exist_ok=True)
+        return f"{os.path.join("Detection", split, img_name)}\t{json.dumps(annotations, ensure_ascii=False)}\n"
+
+    def _rec(
+        self,
+        img_output_path: str,
+        img_path: str,
+        gt: list
+    ) -> list[tuple[str, str]]:
+        img = cv2.imread(img_path)
+        _, img_name = os.path.split(img_path)
+        split = Path(img_output_path).parts[-1]
+        result = []
+        for i, (text, bbox) in enumerate(gt):
+            crop = img[bbox[1]:bbox[3], bbox[0]:bbox[2]]
+            crop_name = img_name.replace(".", f"-{i}.")
+            cv2.imwrite(os.path.join(img_output_path, crop_name), crop)
+
+            result.append((os.path.join("Recognition", split, crop_name), text))
         
-        for split in ["train", "test"]:
-            os.makedirs(os.path.join(root_path, split), exist_ok=True)
-            label_file = open(f"{root_path}/{split}_label.txt","w")
-            for dataset in self.datasets:
-                current_path = f"data/{dataset}"
-                label_dir = sorted(os.listdir(f"{current_path}/{split}"))
-
-                label_content = []
-                for label in label_dir:
-                    img_name = label.replace(".txt","")
-                    img = Image.open(f"{current_path}/images/{img_name}")
-                    for index, (text, bbox) in enumerate(self.read_rows(f"{current_path}/{split}/{label}")):
-                        crop_name = img_name.replace(".",f"-{index}.")
-                        img.crop(bbox).save(f"{root_path}/{split}/{crop_name}")
-                        label_content.append(f"{split}/{crop_name}\t{text}\n")
-                label_file.writelines(label_content)
-            label_file.close()
+        return result
