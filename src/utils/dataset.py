@@ -31,8 +31,7 @@ def check_labels(
             for i, (text, bbox) in enumerate(labels_content[label_filename]):
                 x1, y1, x2, y2 = tuple(ast.literal_eval(bbox))
                 if not(x1 < x2 and y1 < y2):
-                    #os.path.join(dataset_path, split, "labels", label_filename)
-                    errors[f"{dataset_path}/{split}/labels/{label_filename}"] = dict(
+                    errors[os.path.join(dataset_path, split, "labels", label_filename)] = dict(
                         line = i + 1,
                         text = text,
                         bbox = [x1, y1, x2, y2]
