@@ -1,4 +1,7 @@
-from abc import ABC, abstractmethod 
+from abc import ABC, abstractmethod
+import progressbar
+import threading
+import time
 import os
 
 
@@ -17,6 +20,9 @@ class Dataset(ABC):
             self._current = self.sub_datasets[0] # default value
         else:
             self._current = self._root_name()
+
+    def __str__(self) -> str:
+        return self._current
 
     def _root_name(self) -> str:
         '''
@@ -45,7 +51,7 @@ class Dataset(ABC):
         '''
         base_path = os.path.join("data", self._root_name())
         if len(self.sub_datasets) != 0:
-            base_path = os.path.join(base_path, self._current)
+            base_path = os.path.join(base_path, self.__str__())
 
         return base_path
     
@@ -57,17 +63,42 @@ class Dataset(ABC):
     def download(
         self
     ) -> None:
-        # create folders
-        path = self.path()
-        os.makedirs(path, exist_ok=True)
-        for split in ["train", "test"]:
-            split_folder_path = os.path.join(path, split)
-            os.makedirs(split_folder_path, exist_ok=True)
-            for folder in ["images", "labels"]:
-                os.makedirs(os.path.join(split_folder_path, folder), exist_ok=True)
+        if not(self.is_downloaded()):
+            # create folders
+            path = self.path()
+            os.makedirs(path, exist_ok=True)
+            for split in ["train", "test"]:
+                split_folder_path = os.path.join(path, split)
+                os.makedirs(split_folder_path, exist_ok=True)
+                for folder in ["images", "labels"]:
+                    os.makedirs(os.path.join(split_folder_path, folder), exist_ok=True)
 
-        self._download()
-        self._adjust_label_name()
+            # download step
+            downloading = True
+            def progress_bar() -> None:
+                widgets = ["  [", progressbar.AnimatedMarker(), f"] Downloading {self.__str__()} dataset"]
+                bar = progressbar.ProgressBar(widgets=widgets, maxval=progressbar.UnknownLength).start()
+                i = 0
+                while downloading:
+                    i += 1
+                    bar.update(i)
+                    time.sleep(0.1)
+                bar.widgets = [f"  [✓] Downloaded {self.__str__()} dataset"]
+                bar.finish()
+            progress_thread = threading.Thread(target=progress_bar)
+            progress_thread.start()
+
+            self._download()
+            downloading = False
+            progress_thread.join()
+
+            # adjust label name
+            self._adjust_label_name()
+        else:
+            if len(self.config.keys()) > 0:
+                print(f"  [—] {self.__str__()} dataset already downloaded")
+            else:
+                print(f"  [—] {self.__str__()} local dataset ready")
 
     def _adjust_label_name(
         self
