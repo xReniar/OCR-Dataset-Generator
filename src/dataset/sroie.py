@@ -52,7 +52,7 @@ class SROIE(Dataset):
     def _download(self):
         # download images
         zip_path = os.path.join(self.path(), "sroie.zip")
-        gdown.download(self.config[self._current][0], zip_path, quiet=True)
+        gdown.download(self.config[self.__str__()][0], zip_path, quiet=True)
 
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(self.path())
@@ -73,7 +73,7 @@ class SROIE(Dataset):
         # download labels
         data = []
         for split in ["train", "test"]:
-            for sample in load_dataset(self.config[self._current][1], split=split):
+            for sample in load_dataset(self.config[self.__str__()][1], split=split):
                 image_path = sample["image_path"]
 
                 data.append((
