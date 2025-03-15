@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from ..dataloader import Dataloader
-import multiprocessing
+import progressbar
+import threading
+import time
 import os
 
 
@@ -36,15 +38,38 @@ class Generator(ABC):
         self.root_path = os.path.join(self.base_path,f"{self.test_name}-{self.name()}")
         os.makedirs(self.root_path, exist_ok=True)
 
+        print("Creating dataloader")
         dataloader = Dataloader(
             self.transforms,
             self.datasets
         )
+        print("Dataloader created")
 
-        if tasks["det"] == "y":
-            self._generate(dataloader, "Detection", self._det)
-        if tasks["rec"] == "y":
-            self._generate(dataloader, "Recognition", self._rec)
+        generating = None
+
+        def progress_bar(task: str):
+            widgets = [" [", progressbar.AnimatedMarker(), f"] Generating {task} data"]
+            bar = progressbar.ProgressBar(widgets=widgets, maxval=progressbar.UnknownLength).start()
+            i = 0
+            while generating:
+                i += 1
+                bar.update(i)
+                time.sleep(0.1)
+            bar.widgets =  [f" [✓] Generated {task} data"]
+            bar.finish()
+
+        for task_name in tasks.keys():
+            generating = True
+            if tasks[task_name] == "y":
+                progress_thread = threading.Thread(target=progress_bar, args=(task_name,))
+                progress_thread.start()
+                if task_name == "det":
+                    self._generate(dataloader, "Detection", self._det)
+                elif task_name == "rec":
+                    self._generate(dataloader, "Recognition", self._rec)
+                generating = False
+                progress_thread.join()
+
 
     @abstractmethod
     def _generate(self, dataloader: Dataloader, task: str, process) -> None:
