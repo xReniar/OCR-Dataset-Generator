@@ -22,7 +22,7 @@ class Dataloader(ABC):
         
         self.__load_data__()
 
-    def __load_data__(self):
+    def __load_data__(self) -> None:
         for split in ["train", "test"]:
             root_paths = [os.path.join("data", dataset, split, "labels") for dataset in self._datasets]
 
@@ -34,3 +34,9 @@ class Dataloader(ABC):
                 labels = pool.map(reader.read_label, full_paths)
 
             self.data[split] = labels
+    
+    def __filter__(
+        self,
+        data: list
+    ) -> None:
+        pass
