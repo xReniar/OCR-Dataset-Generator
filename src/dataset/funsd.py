@@ -17,8 +17,8 @@ class FUNSD(Dataset):
         super().__init__(config)
 
     def _download(self) -> None:
-        response = requests.get(self.config[self._current])
-        zip_fn = self.config[self._current].split("/")[-1]
+        response = requests.get(self.config[self.__str__()])
+        zip_fn = self.config[self.__str__()].split("/")[-1]
         zip_path = os.path.join(self.path(), zip_fn)
         with open(zip_path,"wb") as f:
             f.write(response.content)
