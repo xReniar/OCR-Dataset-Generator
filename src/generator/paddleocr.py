@@ -42,7 +42,6 @@ class PaddleOCRGenerator(Generator):
                 if task == "Recognition":
                     results = [item for sublist in results for item in sublist]
                     results = [f"{path}\t{text}\n" for (path, text) in results]
-                
                 file.writelines(results)
                 
     def _det(
@@ -56,13 +55,13 @@ class PaddleOCRGenerator(Generator):
         cv2.imwrite(os.path.join(img_output_path, img_name), img)
 
         split = Path(img_output_path).parts[-1]
-        annotations = {}
+        annotations = []
         for (text, bbox) in gt:
             x1, y1, x2, y2 = bbox
-            annotations = dict(
+            annotations.append(dict(
                 transcription=text,
                 points = [[x1, y1],[x2, y1],[x2, y2],[x1, y2]]
-            )
+            ))
 
         return f"{os.path.join('Detection', split, img_name)}\t{json.dumps(annotations, ensure_ascii=False)}\n"
 
