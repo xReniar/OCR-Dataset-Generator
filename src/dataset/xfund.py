@@ -28,8 +28,8 @@ class XFUND(Dataset):
         # download images
         for split in ["train", "val"]:
             folder = "train" if split == "train" else "test"
-            response = requests.get(f"{self.config[self._current]}{split}.zip")
-            zip_fn = self.config[self._current].split("/")[-1]
+            response = requests.get(f"{self.config[self.__str__()]}{split}.zip")
+            zip_fn = self.config[self.__str__()].split("/")[-1]
             current_path = os.path.join(self.path(), f"{zip_fn}{split}.zip")
             with open(current_path,"wb") as f:
                 f.write(response.content)
@@ -42,7 +42,7 @@ class XFUND(Dataset):
         # download and extraction of annotations
         for split in ["train", "val"]:
             folder = "train" if split == "train" else "test"
-            annotation = requests.get(f"{self.config[self._current]}{split}.json", allow_redirects=True).json()
+            annotation = requests.get(f"{self.config[self.__str__()]}{split}.json", allow_redirects=True).json()
             documents:list = annotation["documents"]
             
             for element in documents:
