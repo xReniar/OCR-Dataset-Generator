@@ -38,24 +38,24 @@ class Generator(ABC):
         self.root_path = os.path.join(self.base_path,f"{self.test_name}-{self.name()}")
         os.makedirs(self.root_path, exist_ok=True)
 
-        print("Creating dataloader")
+        print("\nCreating dataloader")
         dataloader = Dataloader(
             self.transforms,
             self.datasets
         )
-        print("Dataloader created")
+        print("Dataloader created\n")
+        print("Generating training data")
 
         generating = None
-
         def progress_bar(task: str):
-            widgets = [" [", progressbar.AnimatedMarker(), f"] Generating {task} data"]
+            widgets = ["  [", progressbar.AnimatedMarker(), f"] Generating {task} data"]
             bar = progressbar.ProgressBar(widgets=widgets, maxval=progressbar.UnknownLength).start()
             i = 0
             while generating:
                 i += 1
                 bar.update(i)
                 time.sleep(0.1)
-            bar.widgets =  [f" [✓] Generated {task} data"]
+            bar.widgets =  [f"  [✓] Generated {task} data"]
             bar.finish()
 
         for task_name in tasks.keys():
