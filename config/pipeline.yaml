@@ -7,6 +7,8 @@ tasks:
     det: y
     rec: y
 
+dict:
+
 # list of dataset to select
 datasets:
     funsd: y
