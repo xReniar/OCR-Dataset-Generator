@@ -1,3 +1,5 @@
 datasets
 gdown
 opencv-python
+progressbar
+wheel
