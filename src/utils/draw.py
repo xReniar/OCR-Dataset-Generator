@@ -1,5 +1,8 @@
 from .reader import read_labels
 import multiprocessing
+import progressbar
+import threading
+import time
 import os
 import cv2
 
@@ -28,9 +31,28 @@ def draw_labels(
                 1
             ))
 
+    drawing = True
+
+    def progress_bar():
+        widgets = ["  [", progressbar.AnimatedMarker(), f"] Drawing labels in \"{dataset_path}\""]
+        bar = progressbar.ProgressBar(widgets=widgets, maxval=progressbar.UnknownLength).start()
+        i = 0
+        while drawing:
+            i += 1
+            bar.update(i)
+            time.sleep(0.1)
+        bar.widgets =  [f"  [✓] Finished drawing \"{dataset_path}\" labels"]
+        bar.finish()
+
+    progress_thread = threading.Thread(target=progress_bar)
+    progress_thread.start()
+
     # start multiprocessing
     with multiprocessing.Pool(processes=os.cpu_count()) as pool:
         pool.starmap(draw_single_img, all_tasks)
+
+    drawing = False
+    progress_thread.join()
 
 def draw_single_img(
     label_filename: str,
