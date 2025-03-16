@@ -37,7 +37,7 @@ def pipeline(
     if os.path.isfile("./errors.json"):
         os.remove("./errors.json")
 
-    print("Checking errors")
+    print("\nChecking errors")
     errors = {}
     for dataset in datasets.keys():
         dataset_instance = datasets[dataset]
@@ -62,6 +62,7 @@ def pipeline(
         print("  [✓] No errors in the selected datasets")
 
         if args.draw:
+            print("\nDraw labels")
             for dataset in datasets.keys():
                 dataset_instance = datasets[dataset]
                 draw_labels(dataset_instance.path())
@@ -88,14 +89,14 @@ def parse_args():
     return args
 
 if __name__ == "__main__":
-    datasets_config: dict = yaml.safe_load(open("./config/pipeline.yaml", "r"))
+    pipeline_config: dict = yaml.safe_load(open("./config/pipeline.yaml", "r"))
     augmentation_config: dict = yaml.safe_load(open("./config/augmentation.yaml", "r"))
 
-    TASKS: dict = datasets_config["tasks"]
-    TEST_NAME: str = datasets_config["test-name"]
-    OCR_SYSTEM: str = datasets_config["ocr-system"]
+    TASKS: dict = pipeline_config["tasks"]
+    TEST_NAME: str = pipeline_config["test-name"]
+    OCR_SYSTEM: str = pipeline_config["ocr-system"]
 
-    datasets: dict = datasets_config["datasets"]
+    datasets: dict = pipeline_config["datasets"]
     defined_classes = list(map(lambda x: str(x).lower(), list(DATASETS.keys())))
     config_classes = list(datasets.keys())
 
@@ -116,11 +117,16 @@ if __name__ == "__main__":
                     selected_datasets[sub] = None
         else:
             raise ValueError(f"Type '{type(value)}' not available")
-
-    if not(any(value == "y" for value in TASKS.values())):
-        print("  [✗] Select at least one task. All the tasks are set to 'n'")
-    
+        
     args = parse_args()
+        
+    if len(selected_datasets.keys()) == 0:
+        print("  [✗] Select at least one dataset. No dataset selected")
+        exit()
+
+    if not(args.draw) and not(any(value == "y" for value in TASKS.values())):
+        print("  [✗] Select at least one task. All the tasks are set to 'n'")
+        exit()
 
     pipeline(
         TEST_NAME,
