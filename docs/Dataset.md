@@ -1,6 +1,6 @@
 # Data folder structure
-Inside the `data` folder, are stored every downloaded dataset specified in the `config.json`.  Below is shown the structure of the `data` folder:
-```bash
+Inside the `data` folder, are stored every downloaded dataset specified in the `pipeline.yaml`.  Below is shown the structure of the `data` folder:
+```shell
 .
 └── data
     ├── dataset-A -----------> # type-1 
@@ -33,7 +33,7 @@ To understand how to add new datasets, it is necessary to distinguish between tw
   - `sub-dataset`: in the example above the `dataset-B` has more variants, each variant is a `sub-dataset`
 ## Dataset format
 So in the example above the structure of `type-1` and `sub-dataset` are the same and explained below:
-```bash
+```shell
 .
 ├── test # suppose from 100 to 150 are for the testing
 │   ├── images
@@ -68,9 +68,9 @@ file.write(f"{word}\t{bbox}\n")
 The `.txt` file should look something like this:
 ```txt
 This [x1,y1,x2,y2]
-is [x1,y1,x2,y2]
-an [x1,y1,x2,y2]
-example [x1,y1,x2,y2]
+is [x3,y3,x4,y4]
+an [x5,y5,x6,y6]
+example [x7,y7,x8,y8]
 ...
 ```
 Where `x1`,`y1`,`x2`,`y2` are absolute points:
