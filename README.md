@@ -21,8 +21,8 @@ At the moment the datasets that can be used to generate the training data are:
 The datasets that will be added are:
 - `IAM`: https://fki.tic.heia-fr.ch/databases/iam-handwriting-database
 - `GNHK`: https://www.goodnotes.com/gnhk
-## Prerequisites
-- `python` version 3.8+ with `pip`
+
+<img src="./docs/Pipeline.png" width=100%>
 
 ## Setup
 ```shell
@@ -47,14 +47,14 @@ To generate the training data check the `./config/pipeline.yaml` first. This yam
   ```
 - `datasets`: specify which datasets are going to be used for the generation of the training data. To select the dataset just set it to `y` otherwise set it to `n`, example below:
   ```yaml
-  # this example selects SROIE dataset and XFUND-ES dataset
+  # this example selects SROIE and XFUND-ES dataset and combines them
   sroie: y
   xfund:
     xfund-de: n
     xfund-es: y
   ```
 
-After selecting all the datases necessary and the task it's possible to start generating the training data by executing `main.py`. The arguments that need to be passed are mutually exclusive and they are:
+After selecting the datasets and the task it's possible to start generating the training data by running `main.py`. The arguments that need to be passed are mutually exclusive and they are:
 - `--generate`: starts the pipeline and stores the training data inside `./output/{test-name}`
 - `--draw`: for each dataset folder inside `./data`, a draw folder will be created, containing two subfolders: `train` and `test`. These subfolders will store all images with the bounding boxes drawn.
 
