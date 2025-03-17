@@ -1,5 +1,5 @@
 # OCR dataset generator
-Training data generator for Text Detection and Text Recognition. The training data will be generated following the format specified by the various supported OCR systems. The supported OCR systems are:
+This project is a tool for downloading and managing `OCR` datasets, combining online and local sources. It supports the creation of datasets for `text detection` and `text recognition`, compatible with this `OCR` tools:
 
 <p align="center">
     <a href="https://github.com/mindee/doctr">
@@ -21,45 +21,53 @@ At the moment the datasets that can be used to generate the training data are:
 The datasets that will be added are:
 - `IAM`: https://fki.tic.heia-fr.ch/databases/iam-handwriting-database
 - `GNHK`: https://www.goodnotes.com/gnhk
+## Prerequisites
+- `python` version 3.8+ with `pip`
 
 ## Setup
-Install the requirements:
 ```shell
+# clone the repository
+git clone https://github.com/xReniar/OCR-Dataset-Generator.git
+
+# install the requirements:
+cd OCR-Dataset-Generator
 pip3 install -r requirements.txt
 ```
 
 # Generate training data
-To generate the training data check the `./config/config.json` first. This json file specifies:
-- `output`: the output of the training data, stored in `./output/`
+To generate the training data check the `./config/pipeline.yaml` first. This yaml file contains:
+- `test-name`: the generated training data will be stored in `./output/{test-name}`
 - `ocr-system`: the ocr system that will be trained, the choices are `doctr`, `mmocr`, `paddleocr`
-- `tasks`: specify if the training data is for `detection`, `recognition` or both.
-  ```py
-  "tasks": ["det"]        # only det
-  "tasks": ["rec"]        # only rec
-  "tasks": ["det", "rec"] # both
+- `tasks`: specify if the training data is for `detection`, `recognition` or both. Possible values are `y` or `n`:
+  ```yaml
+  # both detection and recognition data will be generated
+  tasks:
+    det: y
+    rec: y
   ```
 - `datasets`: specify which datasets are going to be used for the generation of the training data. To select the dataset just set it to `y` otherwise set it to `n`, example below:
-  ```py
-  "dataset1": "y",        # selected
-  "dataset2": {
-      "sub1": "n",        # not selected
-      "sub2": "y"         # selected
-  }
+  ```yaml
+  # this example selects SROIE dataset and XFUND-ES dataset
+  sroie: y
+  xfund:
+    xfund-de: n
+    xfund-es: y
   ```
 
-When everything is set up just run:
-```shell
-python3 main.py --generate
-```
-The generation of the training data won't start unless this errors are not solved:
-- label does not have a corresponding image
-- the values of bounding box are wrong
+After selecting all the datases necessary and the task it's possible to start generating the training data by executing `main.py`. The arguments that need to be passed are mutually exclusive and they are:
+- `--generate`: starts the pipeline and stores the training data inside `./output/{test-name}`
+- `--draw`: for each dataset folder inside `./data`, a draw folder will be created, containing two subfolders: `train` and `test`. These subfolders will store all images with the bounding boxes drawn.
 
-To check if the bounding boxes are correct run
 ```shell
+# examples
+python3 main.py --generate
 python3 main.py --draw
 ```
-This command creates a `draw` folder inside the dataset folder, where all the bounding boxes in the `train` and `test` folder are drawn.
+
+The generation of the training data or the drawing process won't start unless this errors are not solved:
+- label does not have a corresponding image
+- image does not have a corresponsing label
+- the values of bounding box are wrong
 
 # Data output
 Below are shown the output folder after the generation of the training data, and instruction on how to use them. The examples below suppose that both tasks are executed:
