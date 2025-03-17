@@ -7,6 +7,8 @@ This are the supported `OCR` tools:
 - `docTR`: https://github.com/mindee/doctr
 - `mmOCR`: https://github.com/open-mmlab/mmocr
 - `PaddleOCR`: https://github.com/PaddlePaddle/PaddleOCR
+- `yoloV5`: Coming Soon
+- `trOCR`: Coming Soon
 
 At the moment the datasets that can be used to generate the training data are:
 - `FUNSD`: https://guillaumejaume.github.io/FUNSD/
