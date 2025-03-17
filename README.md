@@ -29,7 +29,7 @@ cd OCR-Dataset-Generator
 pip3 install -r requirements.txt
 ```
 
-# Generate training data
+## Generate training data
 To generate the training data check the `./config/pipeline.yaml` first. This yaml file contains:
 - `test-name`: the generated training data will be stored in `./output/{test-name}`
 - `ocr-system`: the ocr system that will be trained, the choices are `doctr`, `mmocr`, `paddleocr`
