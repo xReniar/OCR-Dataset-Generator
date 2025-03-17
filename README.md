@@ -1,5 +1,8 @@
 # OCR dataset generator
-This project is a tool for downloading and managing `OCR` datasets, combining online and local sources. It supports the creation of datasets for `text detection` and `text recognition`, compatible with this `OCR` tools:
+This project is a tool for downloading and managing `OCR` datasets, combining online and local sources. It supports the creation of datasets for `text detection` and `text recognition`. 
+<img src="./docs/Pipeline.png" width=100%>
+
+This are the supported `OCR` tools:
 
 <p align="center">
     <a href="https://github.com/mindee/doctr">
@@ -21,8 +24,6 @@ At the moment the datasets that can be used to generate the training data are:
 The datasets that will be added are:
 - `IAM`: https://fki.tic.heia-fr.ch/databases/iam-handwriting-database
 - `GNHK`: https://www.goodnotes.com/gnhk
-
-<img src="./docs/Pipeline.png" width=100%>
 
 ## Setup
 ```shell
