@@ -51,7 +51,7 @@ To generate the training data check the `./config/pipeline.yaml` first. This yam
 
 After selecting the datasets and the task it's possible to start generating the training data by running `main.py`. The arguments that need to be passed are mutually exclusive and they are:
 - `--generate`: starts the pipeline and stores the training data inside `./output/{test-name}`
-- `--draw`: for each dataset folder inside `./data`, a draw folder will be created, containing two subfolders: `train` and `test`. These subfolders will store all images with the bounding boxes drawn.
+- `--draw`: for each dataset folder inside `./data`, a folder named `draw` containing `train` and `test` folders will be created. These subfolders will store all images with the bounding boxes drawn.
 
 ```shell
 # examples
@@ -59,10 +59,28 @@ python3 main.py --generate
 python3 main.py --draw
 ```
 
-The generation of the training data or the drawing process won't start unless this errors are not solved:
-- label does not have a corresponding image
-- image does not have a corresponsing label
-- the values of bounding box are wrong
+Before generating the training data or drawing the labels there is an `error-checking` step, which basically checks for missing labels or missing images or wrong bounding box coordinates. If there are some errors a `./error.json` file will be created with this structure:
+```json
+{
+    "dataset-name" {
+        "missing_images": [],
+        "missing_labels": [],
+        "label_checking": {
+            "path_to_label.txt" {
+                "line": 34, 
+                "text": "text",
+                "bbox": []
+            }
+        }
+    }
+}
+```
+- `missing_images`: contains the names of label files that do not have a corresponding image file in the `images` folder.
+- `missing_labels`: contains the names of images that do not have a corresponding label file in the `labels` folder.
+- `label_checking`: set of objects where the key is the path to the `.txt` file:
+  - `line`: line of the `.txt` where the bounding box is wrong
+  - `text`: text associated to the wrong bounding box
+  - `bbox`: values of the bounding box
 
 # Data output
 Below are shown the output folder after the generation of the training data, and instruction on how to use them. The examples below suppose that both tasks are executed:
