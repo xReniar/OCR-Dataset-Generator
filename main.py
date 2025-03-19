@@ -13,6 +13,7 @@ def pipeline(
     ocr_system: str,
     tasks: dict,
     datasets: dict,
+    lang: list[str] | None,
     augmentation_config,
     args
 ) -> None:
@@ -68,9 +69,10 @@ def pipeline(
                 draw_labels(dataset_instance.path())
         if args.generate:
             ocr_generator: Generator = OCR_SYSTEMS[ocr_system](
-                test_name,
-                list(datasets.keys()),
-                augmentation_config
+                test_name = test_name,
+                datasets = list(datasets.keys()),
+                lang = lang,
+                transforms = augmentation_config
             )
             ocr_generator.generate_data(tasks)
 
@@ -95,6 +97,8 @@ if __name__ == "__main__":
     TASKS: dict = pipeline_config["tasks"]
     TEST_NAME: str = pipeline_config["test-name"]
     OCR_SYSTEM: str = pipeline_config["ocr-system"]
+    dict_path: str | None = pipeline_config["dict"]
+    DICT = list(map(lambda x: x.split("\n")[0], open(dict_path, "r").readlines())) if dict_path != None else None
 
     datasets: dict = pipeline_config["datasets"]
     defined_classes = list(map(lambda x: str(x).lower(), list(DATASETS.keys())))
@@ -129,10 +133,11 @@ if __name__ == "__main__":
         exit()
 
     pipeline(
-        TEST_NAME,
-        OCR_SYSTEM,
-        TASKS,
-        selected_datasets,
-        augmentation_config,
-        args
+        test_name = TEST_NAME,
+        ocr_system = OCR_SYSTEM,
+        tasks = TASKS,
+        datasets = selected_datasets,
+        lang = DICT,
+        augmentation_config = augmentation_config,
+        args = args
     )
