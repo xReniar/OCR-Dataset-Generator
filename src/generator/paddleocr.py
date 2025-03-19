@@ -12,11 +12,13 @@ class PaddleOCRGenerator(Generator):
         self,
         test_name: str,
         datasets: list,
+        lang: list[str] | None,
         transforms = None
     ) -> None:
         super().__init__(
             test_name,
             datasets,
+            lang,
             transforms
         )
 
