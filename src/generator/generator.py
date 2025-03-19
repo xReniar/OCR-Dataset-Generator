@@ -13,6 +13,7 @@ class Generator(ABC):
         self,
         test_name: str,
         datasets : list[str],
+        lang: list[str] | None,
         transforms
     ) -> None:
         super().__init__()
@@ -27,6 +28,7 @@ class Generator(ABC):
 
         self.test_name = test_name
         self.datasets:list[str] = new_datasets
+        self.lang = lang
         self.transforms = transforms
 
     def name(
@@ -40,8 +42,8 @@ class Generator(ABC):
 
         print("\nCreating dataloader")
         dataloader = Dataloader(
-            self.transforms,
-            self.datasets
+            datasets = self.datasets,
+            lang = self.lang
         )
         print("Dataloader created\n")
         print("Generating training data")
