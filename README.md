@@ -7,17 +7,14 @@ This are the supported `OCR` tools:
 - `docTR`: https://github.com/mindee/doctr
 - `mmOCR`: https://github.com/open-mmlab/mmocr
 - `PaddleOCR`: https://github.com/PaddlePaddle/PaddleOCR
-- `YOLO`: Coming Soon
-- `TrOCR`: Coming Soon
+- `YOLO` + `TrOCR`: Coming Soon
 
 At the moment the datasets that can be used to generate the training data are:
 - `FUNSD`: https://guillaumejaume.github.io/FUNSD/
 - `SROIE`: https://paperswithcode.com/paper/icdar2019-competition-on-scanned-receipt-ocr
 - `XFUND`: https://github.com/doc-analysis/XFUND (`de`,`es`,`fr`,`it`,`ja`,`pt`,`zh`)
-
-The datasets that will be added are:
-- `IAM`: https://fki.tic.heia-fr.ch/databases/iam-handwriting-database
-- `GNHK`: https://www.goodnotes.com/gnhk
+- `IAM`: https://fki.tic.heia-fr.ch/databases/iam-handwriting-database (Coming Soon)
+- `GNHK`: https://www.goodnotes.com/gnhk (Coming Soon)
 
 ## Setup
 ```shell
