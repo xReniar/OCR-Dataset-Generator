@@ -3,20 +3,20 @@ This project is a tool for downloading and managing `OCR` datasets, combining on
 
 <img src="./docs/Pipeline.png" width=100%>
 
-This are the supported `OCR` tools:
-- `docTR`: https://github.com/mindee/doctr
-- `mmOCR`: https://github.com/open-mmlab/mmocr
-- `PaddleOCR`: https://github.com/PaddlePaddle/PaddleOCR
-- `YOLO` + `TrOCR`: Coming Soon
+## Supported OCR tools
+- `doctr`: https://github.com/mindee/doctr
+- `mmocr`: https://github.com/open-mmlab/mmocr
+- `paddleocr`: https://github.com/PaddlePaddle/PaddleOCR
+- `yolo+trocr`: Coming Soon
 
-At the moment the datasets that can be used to generate the training data are:
+## Available datasets
 - `FUNSD`: https://guillaumejaume.github.io/FUNSD/
 - `SROIE`: https://paperswithcode.com/paper/icdar2019-competition-on-scanned-receipt-ocr
 - `XFUND`: https://github.com/doc-analysis/XFUND (`de`,`es`,`fr`,`it`,`ja`,`pt`,`zh`)
 - `IAM`: https://fki.tic.heia-fr.ch/databases/iam-handwriting-database (Coming Soon)
 - `GNHK`: https://www.goodnotes.com/gnhk (Coming Soon)
 
-## Setup
+# Setup
 ```shell
 # clone the repository
 git clone https://github.com/xReniar/OCR-Dataset-Generator.git
@@ -26,10 +26,10 @@ cd OCR-Dataset-Generator
 pip3 install -r requirements.txt
 ```
 
-## Generate training data
+# Generate training data
 To generate the training data check the `./config/pipeline.yaml` first. This yaml file contains:
 - `test-name`: the generated training data will be stored in `./output/{test-name}`
-- `ocr-system`: the ocr system that will be trained, the choices are `doctr`, `mmocr`, `paddleocr`
+- `ocr-system`: the ocr system that will be trained, the choices are listed [here](#supported-ocr-tools)
 - `tasks`: specify if the training data is for `detection`, `recognition` or both. Possible values are `y` or `n`:
   ```yaml
   # both detection and recognition data will be generated
