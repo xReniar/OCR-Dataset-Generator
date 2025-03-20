@@ -1,4 +1,4 @@
-from .reader import read_labels
+from ..dataloader import Dataloader
 import multiprocessing
 import progressbar
 import threading
@@ -7,66 +7,79 @@ import os
 import cv2
 
 
+
 def draw_labels(
-    dataset_path: str
+    datasets: list[str],
+    lang: list[str]
 ) -> None:
-    os.makedirs(os.path.join(dataset_path,"draw"), exist_ok=True)
-    all_tasks = []
+    new_datasets = []
+    for dataset in datasets:
+        if "-" in dataset:
+            root = dataset.split("-")[0]
+            new_datasets.append(os.path.join(root, dataset))
+        else:
+            new_datasets.append(dataset)
+    
+    print("\nCreating dataloader")
+    dataloaders = {}
+    for dataset in new_datasets:
+        dataloaders[dataset] = Dataloader(
+            datasets = [dataset],
+            lang = lang
+        )
+    print("Dataloader created\n")
 
-    # create tasks
-    for split in ["train", "test"]:
-        label_dir = os.path.join(dataset_path, split, "labels")
-        img_dir = os.path.join(dataset_path, split, "images")
-        output_dir = os.path.join(dataset_path, "draw", split)
-        os.makedirs(output_dir, exist_ok=True)
-        
-        labels_content = read_labels(label_dir)
-        for label_filename in labels_content.keys():
-            all_tasks.append((
-                label_filename,
-                labels_content[label_filename],
-                img_dir,
-                output_dir,
-                (0, 0, 0),
-                1
-            ))
+    print("Draw labels")
+    for dataset in dataloaders.keys():
+        draw_folder_path = os.path.join("data", dataset, "draw")
+        os.makedirs(draw_folder_path, exist_ok=True)
 
-    drawing = True
+        args = []
+        dataloader = dataloaders[dataset]
+        for split in ["train", "test"]:
+            split_draw_path = os.path.join(draw_folder_path, split)
+            os.makedirs(split_draw_path, exist_ok=True)
+            for (img_path, labels) in dataloader.data[split]:
+                args.append((
+                    img_path,
+                    labels,
+                    split_draw_path,
+                    (0, 0, 0),
+                    1
+                ))
 
-    def progress_bar():
-        widgets = ["  [", progressbar.AnimatedMarker(), f"] Drawing labels in \"{dataset_path}\""]
-        bar = progressbar.ProgressBar(widgets=widgets, maxval=progressbar.UnknownLength).start()
-        i = 0
-        while drawing:
-            i += 1
-            bar.update(i)
-            time.sleep(0.1)
-        bar.widgets =  [f"  [✓] Finished drawing \"{dataset_path}\" labels"]
-        bar.finish()
+        drawing = True
+        def progress_bar():
+            widgets = ["  [", progressbar.AnimatedMarker(), f"] Drawing labels in \"{dataset}\""]
+            bar = progressbar.ProgressBar(widgets=widgets, maxval=progressbar.UnknownLength).start()
+            i = 0
+            while drawing:
+                i += 1
+                bar.update(i)
+                time.sleep(0.1)
+            bar.widgets =  [f"  [✓] Finished drawing \"{dataset}\" labels"]
+            bar.finish()
 
-    progress_thread = threading.Thread(target=progress_bar)
-    progress_thread.start()
+        progress_thread = threading.Thread(target=progress_bar)
+        progress_thread.start()
 
-    # start multiprocessing
-    with multiprocessing.Pool(processes=os.cpu_count()) as pool:
-        pool.starmap(draw_single_img, all_tasks)
+        with multiprocessing.Pool(processes=os.cpu_count()) as pool:
+            pool.starmap(draw_single_img, args)
 
-    drawing = False
-    progress_thread.join()
+        drawing = False
+        progress_thread.join()
 
 def draw_single_img(
-    label_filename: str,
-    label_data: str,
-    img_dir: str,
+    img_path: str,
+    labels: list,
     output_dir: str,
     color: tuple,
     thickness: int
 ) -> None:
-    img_name = label_filename.strip(".txt")
-    
-    img = cv2.imread(os.path.join(img_dir, img_name))
+    _, img_name = os.path.split(img_path)
+    img = cv2.imread(img_path)
 
-    for (_, bbox) in label_data:
+    for (_, bbox) in labels:
         img = cv2.rectangle(
             img = img,
             pt1 = (bbox[0], bbox[1]),
