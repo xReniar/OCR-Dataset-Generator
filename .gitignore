@@ -2,4 +2,5 @@ venv
 data
 __pycache__
 output
+draw
 errors.json
