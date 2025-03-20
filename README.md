@@ -1,5 +1,5 @@
 # OCR dataset generator
-This project is a tool for downloading and managing `OCR` datasets, combining online and local sources. It supports the creation of training data for `text detection` and `text recognition`.
+This project is a tool for downloading and managing `OCR` datasets, combining online and local sources. It supports the creation of training data for `text detection` and `text recognition` for various OCR tools.
 
 <img src="./docs/Pipeline.png" width=100%>
 
