@@ -50,7 +50,7 @@ def draw_labels(
 
         drawing = True
         def progress_bar():
-            widgets = ["  [", progressbar.AnimatedMarker(), f"] Drawing labels in \"{dataset}\""]
+            widgets = ["  [", progressbar.AnimatedMarker(), f"] Drawing labels in \"data/{dataset}\""]
             bar = progressbar.ProgressBar(widgets=widgets, maxval=progressbar.UnknownLength).start()
             i = 0
             while drawing:
