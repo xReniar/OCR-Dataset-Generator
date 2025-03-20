@@ -63,10 +63,10 @@ def pipeline(
         print("  [✓] No errors in the selected datasets")
 
         if args.draw:
-            print("\nDraw labels")
-            for dataset in datasets.keys():
-                dataset_instance = datasets[dataset]
-                draw_labels(dataset_instance.path())
+            draw_labels(
+                datasets = sorted(list(datasets.keys())),
+                lang=lang
+            )
         if args.generate:
             ocr_generator: Generator = OCR_SYSTEMS[ocr_system](
                 test_name = test_name,
