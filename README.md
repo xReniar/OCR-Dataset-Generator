@@ -29,7 +29,7 @@ pip3 install -r requirements.txt
 # Generate training data
 To generate the training data check the `./config/pipeline.yaml` first. This yaml file contains:
 - `test-name`: the generated training data will be stored in `./output/{test-name}`
-- `ocr-system`: the ocr system that will be trained, the choices are listed [here](#supported-ocr-tools)
+- `ocr-system`: specifies the OCR system that will be trained, the choices are listed [here](#supported-ocr-tools)
 - `tasks`: specify if the training data is for `detection`, `recognition` or both. Possible values are `y` or `n`:
   ```yaml
   # both detection and recognition data will be generated
@@ -37,8 +37,8 @@ To generate the training data check the `./config/pipeline.yaml` first. This yam
     det: y
     rec: y
   ```
-- `dict`: path to `.txt` file containing set of characters you want to include for the training data, default is `./dict/en_dict.txt`. Both generation and draw-label steps follow the specified `dict`, if there are no values then all the characters will be included  
-- `datasets`: specify which datasets are going to be used for the generation of the training data. To select the dataset just set it to `y` otherwise set it to `n`, example below:
+- `dict`: path to a `.txt` file containing the set of characters to be included in the training data. The default is `./dict/en_dict.txt`. Both the generation and draw-label steps will follow the specified `dict`. If left empty, all characters will be included.
+- `datasets`: specifies which datasets are going to be used for the generation of the training data. To select the dataset just set it to `y` otherwise set it to `n`, example below:
   ```yaml
   # this example selects SROIE and XFUND-ES dataset and combines them
   sroie: y
