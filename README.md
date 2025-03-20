@@ -49,7 +49,7 @@ To generate the training data check the `./config/pipeline.yaml` first. This yam
 
 After selecting the datasets and the task it's possible to start generating the training data by running `main.py`. The arguments that need to be passed are mutually exclusive and they are:
 - `--generate`: starts the pipeline and stores the training data inside `./output/{test-name}`
-- `--draw`: for each dataset folder inside `./data`, a folder named `draw` containing `train` and `test` folders will be created. These subfolders will store all images with the bounding boxes drawn.
+- `--draw`: creates a `./draw` folder where it contains the bounding box in every image. This `draw` folder contains sub-folders for each dataset specified in `datasets`
 
 ```shell
 # examples
