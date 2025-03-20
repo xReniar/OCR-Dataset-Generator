@@ -31,7 +31,7 @@ def draw_labels(
 
     print("Draw labels")
     for dataset in dataloaders.keys():
-        draw_folder_path = os.path.join("data", dataset, "draw")
+        draw_folder_path = os.path.join("draw", dataset)
         os.makedirs(draw_folder_path, exist_ok=True)
 
         args = []
