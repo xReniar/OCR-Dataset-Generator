@@ -11,10 +11,10 @@ This project is a tool for downloading and managing `OCR` datasets, combining on
 
 ## Available datasets
 - `FUNSD`: https://guillaumejaume.github.io/FUNSD/
+- `GNHK`: https://www.goodnotes.com/gnhk
+- `IAM`: https://fki.tic.heia-fr.ch/databases/iam-handwriting-database (Coming Soon)
 - `SROIE`: https://paperswithcode.com/paper/icdar2019-competition-on-scanned-receipt-ocr
 - `XFUND`: https://github.com/doc-analysis/XFUND (`de`,`es`,`fr`,`it`,`ja`,`pt`,`zh`)
-- `IAM`: https://fki.tic.heia-fr.ch/databases/iam-handwriting-database (Coming Soon)
-- `GNHK`: https://www.goodnotes.com/gnhk (Coming Soon)
 
 # Setup
 ```shell
