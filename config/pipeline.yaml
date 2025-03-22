@@ -12,14 +12,14 @@ dict: ./dict/en_dict.txt
 # list of dataset to select
 datasets:
     funsd: y
-    gnhk: n
-    iam: n
-    sroie: n
+    gnhk:
+    iam:
+    sroie:
     xfund:
-        xfund-de: n
-        xfund-es: n
-        xfund-fr: n
-        xfund-it: n
-        xfund-ja: n
-        xfund-pt: n
-        xfund-zh: n
+        xfund-de:
+        xfund-es: 
+        xfund-fr:
+        xfund-it:
+        xfund-ja:
+        xfund-pt:
+        xfund-zh:
