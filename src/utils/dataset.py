@@ -11,12 +11,16 @@ def check_images(
         labels_dir = set(map(lambda fn: fn.split(".")[0], sorted(os.listdir(os.path.join(dataset_path, split, "labels")))))
 
         missing_labels = images_dir - labels_dir
-        if not(missing_labels):
+        if len(missing_labels) < len(images_dir):
             errors["missing_labels"] = list(missing_labels)
+        else:
+            errors["missing_labels"] = []
 
         missing_images = labels_dir - images_dir
-        if not(missing_images):
+        if len(missing_images) < len(labels_dir):
             errors["missing_images"] = list(missing_images)
+        else:
+            errors["missing_images"] = []
     
     return errors
 
