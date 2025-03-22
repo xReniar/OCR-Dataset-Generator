@@ -115,12 +115,10 @@ if __name__ == "__main__":
         if isinstance(value, str):
             if value == "y":
                 selected_datasets[dataset] = None
-        elif isinstance(value, dict):
+        if isinstance(value, dict):
             for sub in value.keys():
                 if value[sub] == "y":
                     selected_datasets[sub] = None
-        else:
-            raise ValueError(f"Type '{type(value)}' not available")
         
     args = parse_args()
         
