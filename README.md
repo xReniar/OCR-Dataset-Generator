@@ -30,12 +30,17 @@ pip3 install -r requirements.txt
 To generate the training data check the `./config/pipeline.yaml` first. This yaml file contains:
 - `test-name`: the generated training data will be stored in `./output/{test-name}`
 - `ocr-system`: specifies the OCR system that will be trained, the choices are listed [here](#supported-ocr-tools)
-- `tasks`: specify if the training data is for `detection`, `recognition` or both. Possible values are `y` or `n`:
+- `tasks`: specify if the training data is for `detection`, `recognition` or both. To select the task set it to `y` or leave it empty otherwise
   ```yaml
   # both detection and recognition data will be generated
   tasks:
     det: y
     rec: y
+
+  # only detection data will be generated
+  tasks:
+    det: y
+    rec:
   ```
 - `dict`: path to a `.txt` file containing the set of characters to be included in the training data. The default is `./dict/en_dict.txt`. Both the generation and draw-label steps will follow the specified `dict`. If left empty, all characters will be included.
 - `datasets`: specifies which datasets are going to be used for the generation of the training data. To select the dataset just set it to `y` otherwise set it to `n`, example below:
@@ -43,7 +48,7 @@ To generate the training data check the `./config/pipeline.yaml` first. This yam
   # this example selects SROIE and XFUND-ES dataset and combines them
   sroie: y
   xfund:
-    xfund-de: n
+    xfund-de:
     xfund-es: y
   ```
 
@@ -64,7 +69,7 @@ Before generating the training data or drawing the labels there is an `error-che
         "missing_images": [],
         "missing_labels": [],
         "label_checking": {
-            "path_to_label.txt" {
+            "path/to/label.txt" {
                 "line": 34, 
                 "text": "text",
                 "bbox": []
