@@ -46,7 +46,7 @@ class Generator(ABC):
             lang = self.lang
         )
         print("Dataloader created\n")
-        print("Generating training data")
+        print(f"Generating training data for {self.name()}")
 
         generating = None
         def progress_bar(task: str):
