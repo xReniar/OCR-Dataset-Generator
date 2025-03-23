@@ -127,7 +127,7 @@ if __name__ == "__main__":
         exit()
 
     if not(args.draw) and not(any(value == "y" for value in TASKS.values())):
-        print("  [✗] Select at least one task. All the tasks are set to 'n'")
+        print("  [✗] Select at least one task. All the tasks are set to None")
         exit()
 
     pipeline(
