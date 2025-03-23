@@ -25,7 +25,7 @@ git clone https://github.com/xReniar/OCR-Dataset-Generator.git
 cd OCR-Dataset-Generator
 pip3 install -r requirements.txt
 ```
-- Some datasets specified [here](#available-datasets) it may be necessary to setup `kaggle` to download them
+
 # Generate training data
 To generate the training data check the `./config/pipeline.yaml` first. This yaml file contains:
 - `test-name`: the generated training data will be stored in `./output/{test-name}`
