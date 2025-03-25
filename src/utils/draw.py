@@ -1,11 +1,10 @@
 from ..dataloader import Dataloader
+from PIL import Image, ImageDraw
 import multiprocessing
 import progressbar
 import threading
 import time
 import os
-import cv2
-
 
 
 def draw_labels(
@@ -44,7 +43,7 @@ def draw_labels(
                     img_path,
                     labels,
                     split_draw_path,
-                    (0, 0, 0),
+                    "black",
                     1
                 ))
 
@@ -73,19 +72,22 @@ def draw_single_img(
     img_path: str,
     labels: list,
     output_dir: str,
-    color: tuple,
-    thickness: int
+    color: str,
+    width: int
 ) -> None:
     _, img_name = os.path.split(img_path)
-    img = cv2.imread(img_path)
+    img = Image.open(img_path)
+    if img.mode == 'RGBA':
+        img = img.convert('RGB')
+
+    draw = ImageDraw.Draw(img)
 
     for (_, bbox) in labels:
-        img = cv2.rectangle(
-            img = img,
-            pt1 = (bbox[0], bbox[1]),
-            pt2 = (bbox[2], bbox[3]),
-            color = color,
-            thickness = thickness
+        draw.rectangle(
+            xy = bbox,
+            outline = color,
+            width = width
         )
 
-    cv2.imwrite(os.path.join(output_dir, img_name), img)
+    img.save(os.path.join(output_dir, img_name))
+    img.close()
