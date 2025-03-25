@@ -1,7 +1,7 @@
 from .generator import Generator
 from ..dataloader import Dataloader
+from PIL import Image
 import multiprocessing
-import cv2
 import hashlib
 import json
 import os
@@ -54,7 +54,9 @@ class DoctrGenerator(Generator):
         img_path: str,
         gt: list
     ) -> tuple[str, dict]:
-        img = cv2.imread(img_path)
+        img = Image.open(img_path)
+        if img.mode == 'RGBA':
+            img = img.convert('RGB')
         _, img_name = os.path.split(img_path)
 
         polygons = []
@@ -62,15 +64,17 @@ class DoctrGenerator(Generator):
             x1, y1, x2, y2 = tuple(bbox)
             polygons.append([[x1, y1],[x1, y2],[x2, y2],[x2, y1]])
 
-        cv2.imwrite(os.path.join(img_output_path, img_name), img)
+        img.save(os.path.join(img_output_path, img_name))
+
         result = (
             img_name,
             dict(
-                img_dimensions = (img.shape[1], img.shape[0]),
-                img_hash = hashlib.sha256(img).hexdigest(),
+                img_dimensions = (img.width, img.height),
+                img_hash = hashlib.sha256(img.tobytes()).hexdigest(),
                 polygons = polygons
             )
         )
+        img.close()
 
         return result
     
@@ -80,16 +84,20 @@ class DoctrGenerator(Generator):
         img_path: str,
         gt: list
     ) -> list[tuple[str, str]]:
-        img = cv2.imread(img_path)
+        img = Image.open(img_path)
+        if img.mode == 'RGBA':
+            img = img.convert('RGB')
 
         _, img_name = os.path.split(img_path)
 
         result = []
         for i, (text, bbox) in enumerate(gt):
-            crop = img[bbox[1]:bbox[3], bbox[0]:bbox[2]]
+            crop = img.crop(bbox)
             crop_name = img_name.replace(".", f"-{i}.")
-            cv2.imwrite(os.path.join(img_output_path, crop_name), crop)
+            crop.save(os.path.join(img_output_path, crop_name))
+            crop.close()
 
             result.append((crop_name, text))
+        img.close()
         
         return result
