@@ -1,6 +1,6 @@
 # docTR
 This is the structure of the generated training data (suppose that both `detection` and `recognition` are selected)
-```bash
+```txt
 .
 └── output
     └── {test-name}-doctr
