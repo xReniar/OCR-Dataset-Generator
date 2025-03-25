@@ -1,6 +1,6 @@
 from .dataset import Dataset
 from datasets import load_dataset
-import cv2
+from PIL import Image
 import multiprocessing
 import gdown
 import zipfile
@@ -42,11 +42,11 @@ class SROIE(Dataset):
         img_id, _ = tuple(img_name.split(".")) 
         with open(os.path.join(current_path, "labels", f"{img_id}.txt"), "w") as file:
             img_path = os.path.join(current_path, "images", img_name)
-            img = cv2.imread(img_path)
+            img = Image.open(img_path)
 
             lines = []
             for (word, bbox) in list(zip(words, bboxes)):
-                lines.append(f"{word}\t{self.get_original_bbox(bbox, (img.shape[1], img.shape[0]))}\n")
+                lines.append(f"{word}\t{self.get_original_bbox(bbox, (img.width, img.height))}\n")
             file.writelines(lines)
 
     def _download(self):
