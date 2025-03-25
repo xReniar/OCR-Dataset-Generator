@@ -35,7 +35,7 @@ To start the training just run `train_pytorch.py` or `train_tensorflow.py` situa
 # this example shows training crnn_vgg16_bn with pytorch
 python3 doctr/references/recognition/train_pytorch.py \
     crnn_vgg16_bn \
-    --train_path path/to/output/{test-name}-doctr/Detection/train \
-    --val_path path/to/output/{test-name}-doctr/Detection/test \
+    --train_path path/to/output/{test-name}-doctr/Recognition/train \
+    --val_path path/to/output/{test-name}-doctr/Recognition/test \
     --epochs 5
 ```
