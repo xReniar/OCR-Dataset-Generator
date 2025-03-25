@@ -1,5 +1,6 @@
 # mmOCR
-```bash
+This is the structure of the generated training data
+```txt
 .
 └── output
     └── {test-name}-mmocr
