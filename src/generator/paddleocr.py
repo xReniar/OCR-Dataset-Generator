@@ -1,8 +1,8 @@
 from .generator import Generator
 from ..dataloader import Dataloader
+from PIL import Image
 from pathlib import Path
 import multiprocessing
-import cv2
 import os
 import json
 
@@ -52,9 +52,12 @@ class PaddleOCRGenerator(Generator):
         img_path: str,
         gt: list
     ) -> str:
-        img = cv2.imread(img_path)
+        img = Image.open(img_path)
+        if img.mode == 'RGBA':
+            img = img.convert('RGB')
+            
         _, img_name = os.path.split(img_path)
-        cv2.imwrite(os.path.join(img_output_path, img_name), img)
+        img.save(os.path.join(img_output_path, img_name))
 
         split = Path(img_output_path).parts[-1]
         annotations = []
@@ -64,6 +67,7 @@ class PaddleOCRGenerator(Generator):
                 transcription=text,
                 points = [[x1, y1],[x2, y1],[x2, y2],[x1, y2]]
             ))
+        img.close()
 
         return f"{os.path.join('Detection', split, img_name)}\t{json.dumps(annotations, ensure_ascii=False)}\n"
 
@@ -73,15 +77,20 @@ class PaddleOCRGenerator(Generator):
         img_path: str,
         gt: list
     ) -> list[tuple[str, str]]:
-        img = cv2.imread(img_path)
+        img = Image.open(img_path)
+        if img.mode == 'RGBA':
+            img = img.convert('RGB')
+
         _, img_name = os.path.split(img_path)
         split = Path(img_output_path).parts[-1]
         result = []
         for i, (text, bbox) in enumerate(gt):
-            crop = img[bbox[1]:bbox[3], bbox[0]:bbox[2]]
+            crop = img.crop(bbox)
             crop_name = img_name.replace(".", f"-{i}.")
-            cv2.imwrite(os.path.join(img_output_path, crop_name), crop)
+            crop.save(os.path.join(img_output_path, crop_name))
+            crop.close()
 
             result.append((os.path.join("Recognition", split, crop_name), text))
+        img.close()
         
         return result
