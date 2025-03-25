@@ -1,8 +1,8 @@
 from .generator import Generator
 from ..dataloader import Dataloader
+from PIL import Image
 from pathlib import Path
 import multiprocessing
-import cv2
 import os
 import json
 
@@ -68,9 +68,12 @@ class MMOCRGenerator(Generator):
         img_path: str,
         gt: list
     ) -> dict:
-        img = cv2.imread(img_path)
+        img = Image.open(img_path)
+        if img.mode == 'RGBA':
+            img = img.convert('RGB')
+
         _, img_name = os.path.split(img_path)
-        cv2.imwrite(os.path.join(img_output_path, img_name), img)
+        img.save(os.path.join(img_output_path, img_name))
 
         split = Path(img_output_path).parts[-1]
         instances = []
@@ -83,12 +86,15 @@ class MMOCRGenerator(Generator):
                 ignore = False
             ))
         
-        return dict(
+        result = dict(
             instances = instances,
             img_path = os.path.join("imgs", split, img_name),
-            width = img.shape[1],
-            height = img.shape[0]
+            width = img.width,
+            height = img.height
         )
+        img.close()
+
+        return result
 
     def _rec(
         self,
@@ -96,18 +102,24 @@ class MMOCRGenerator(Generator):
         img_path: str,
         gt: list
     ) -> list[dict]:
-        img = cv2.imread(img_path)
+        img = Image.open(img_path)
+        if img.mode == 'RGBA':
+            img = img.convert('RGB')
+
         _, img_name = os.path.split(img_path)
         split = Path(img_output_path).parts[-1]
+
         data_list = []
         for i, (text, bbox) in enumerate(gt):
-            crop = img[bbox[1]:bbox[3], bbox[0]:bbox[2]]
+            crop = img.crop(bbox)
             crop_name = img_name.replace(".", f"-{i}.")
-            cv2.imwrite(os.path.join(img_output_path, crop_name), crop)
+            crop.save(os.path.join(img_output_path, crop_name))
+            crop.close()
 
             data_list.append(dict(
                 instances = [{"text": text}],
                 img_path = os.path.join("imgs", split, img_name)
             ))
+        img.close()
         
         return data_list
