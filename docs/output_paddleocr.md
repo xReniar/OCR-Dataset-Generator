@@ -1,5 +1,6 @@
 # paddleOCR
-```bash
+This is the structure of the generated training data
+```txt
 .
 └── output
     └── {test-name}-paddleocr
@@ -15,5 +16,11 @@
             └── train_label.txt
 ```
 ## Text Detection training
+To start the text detection training, `PaddleOCR` needs a `yml` configuration
+```bash
+```
 
 ## Text Recognition training
+To start the text recognition training, `PaddleOCR` needs a `yml` configuration
+```bash
+```
