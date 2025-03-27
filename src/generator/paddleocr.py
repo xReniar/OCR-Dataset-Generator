@@ -26,7 +26,7 @@ class PaddleOCRGenerator(Generator):
         self,
         dataloader: Dataloader,
         task: str,
-        process,
+        process
     ) -> None:
         root_path = os.path.join(self.root_path, task)
         os.makedirs(root_path, exist_ok=True)
