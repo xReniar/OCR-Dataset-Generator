@@ -11,6 +11,7 @@ dict: ./dict/en_dict.txt
 
 # list of dataset to select
 datasets:
+    cord:
     funsd: y
     gnhk:
     iam:
@@ -23,3 +24,4 @@ datasets:
         xfund-ja:
         xfund-pt:
         xfund-zh:
+    wildreceipt:
