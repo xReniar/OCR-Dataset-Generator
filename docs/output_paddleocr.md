@@ -1,4 +1,4 @@
-# paddleOCR
+# PaddleOCR
 This is the structure of the generated training data
 ```txt
 .
@@ -15,6 +15,7 @@ This is the structure of the generated training data
             ├── test_label.txt
             └── train_label.txt
 ```
+Download the [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) repository before performing the instruction below.
 ## Text Detection training
 To start the text detection training, `PaddleOCR` needs a `yml` configuration
 ```bash
