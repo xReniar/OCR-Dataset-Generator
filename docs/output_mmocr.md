@@ -17,6 +17,7 @@ This is the structure of the generated training data
             ├── test.json
             └── train.json
 ```
+Download the [mmOCR](https://github.com/open-mmlab/mmocr) repository before performing the instruction below.
 ## Text Detection training
 
 ## Text Recognition training
