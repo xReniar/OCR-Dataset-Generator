@@ -5,15 +5,18 @@ This project is a tool for downloading and managing `OCR` datasets, combining on
 
 ## Supported OCR tools
 - `doctr`: https://github.com/mindee/doctr
+- `easyocr`: https://github.com/JaidedAI/EasyOCR (coming soon)
 - `mmocr`: https://github.com/open-mmlab/mmocr
 - `paddleocr`: https://github.com/PaddlePaddle/PaddleOCR
-- `yolo+trocr`: Coming Soon
+- `yolo+trocr`: [YOLO](https://github.com/ultralytics/yolov5), [TrOCR](https://arxiv.org/abs/2109.10282)
 
 ## Available datasets
+- `CORD`: https://paperswithcode.com/dataset/cord
 - `FUNSD`: https://guillaumejaume.github.io/FUNSD/
 - `GNHK`: https://www.goodnotes.com/gnhk
 - `IAM`: https://fki.tic.heia-fr.ch/databases/iam-handwriting-database (Coming Soon)
 - `SROIE`: https://paperswithcode.com/paper/icdar2019-competition-on-scanned-receipt-ocr
+- `WILDRECEIPT`: https://paperswithcode.com/dataset/wildreceipt
 - `XFUND`: https://github.com/doc-analysis/XFUND (`de`,`es`,`fr`,`it`,`ja`,`pt`,`zh`)
 
 # Setup
@@ -88,8 +91,10 @@ Before generating the training data or drawing the labels there is an `error-che
 # Data output
 Below are shown the output folder after the generation of the training data, and instruction on how to use them. The examples below suppose that both tasks are executed:
 - [doctr output](./docs/output_doctr.md)
+- [easyocr output](./docs/output_easyocr.md)
 - [mmocr output](./docs/output_mmocr.md)
 - [paddleocr output](./docs/output_paddleocr.md)
+- [yolo+trocr output](./docs/output_yolo+trocr.md)
 # Docs
 - [Understand how datasets works](./docs/Dataset.md)
 - [Add new Dataset](./docs/AddDataset.md)
