@@ -20,10 +20,11 @@ class WILDRECEIPT(Dataset):
 
     @staticmethod
     def get_bbox(bbox: list[int]):
+        bbox = list(map(lambda x: int(x), bbox))
         xm, ym, xM, yM = bbox[0], bbox[1], 0, 0
 
         for i in range(0, len(bbox), 2):
-            coord = list(map(lambda x: int(x), bbox[i:i+2]))
+            coord = bbox[i:i+2]
             xm = min(xm, coord[0])
             ym = min(ym, coord[1])
             xM = max(xM, coord[0])
