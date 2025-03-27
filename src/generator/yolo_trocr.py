@@ -7,8 +7,8 @@ class YOLOTrOCRGenerator(Generator):
         self,
         test_name: str,
         datasets: list,
-        lang ,
-        transforms
+        lang: list[str] | None,
+        transforms = None
     ) -> None:
         super().__init__(
             test_name,
@@ -21,7 +21,7 @@ class YOLOTrOCRGenerator(Generator):
         self,
         dataloader: Dataloader,
         task: str,
-        process,
+        process
     ) -> None:
         pass
 
@@ -38,5 +38,5 @@ class YOLOTrOCRGenerator(Generator):
         img_output_path: str,
         img_path: str,
         gt: list
-    ) -> list[tuple[str, str]]:
+    ) -> None:
         pass
