@@ -25,7 +25,7 @@ To train yolo clone the `yolov5` repository:
 git clone https://github.com/ultralytics/yolov5.git
 ```
 
-Suppose the dataset is called `dataset`, create a `dataset.yaml` inside `./data` like this:
+Suppose the dataset is called `dataset`, create a `dataset.yaml` inside `yolov5/data` like this:
 ```yaml
 path: path/to/output/{test-name}-yolotrocr/Detection
 train: train/images
@@ -35,9 +35,10 @@ names:
    0: text
 ```
 
-To start the training execute this command:
+To start the training execute this commands:
 ```bash
 cd yolov5
+# suppose the selected model is the yolov5s
 python3 train.py --epochs 3 --data dataset.yaml --weights yolov5s.pt
 ```
 ## Text Recognition training
