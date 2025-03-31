@@ -64,6 +64,7 @@ After selecting the datasets and the task it's possible to start generating the 
 python3 main.py --generate
 python3 main.py --draw
 ```
+After the generation process check `Data output`(#data-output), these are instructions on how to use the generated dataset if the user does not how to start the training process.
 
 Before generating the training data or drawing the labels there is an `error-checking` step, which basically checks for missing labels or missing images or wrong bounding box coordinates. If there are some errors a `./error.json` file will be created with this structure:
 ```json
@@ -89,7 +90,7 @@ Before generating the training data or drawing the labels there is an `error-che
   - `bbox`: values of the bounding box
 
 # Data output
-Below are shown the output folder after the generation of the training data, and instruction on how to use them. The examples below suppose that both tasks are executed:
+Below are shown the details of the output folders generated after the training data generation, along with instructions on how to use them. The examples below assume that both tasks are selected.
 - [doctr output](./docs/output_doctr.md)
 - [easyocr output](./docs/output_easyocr.md)
 - [mmocr output](./docs/output_mmocr.md)
@@ -102,4 +103,4 @@ Below are shown the output folder after the generation of the training data, and
 
 ## Future developments
 - Add workflow for data augmentation
-- Modify dataset to manage rotated text
+- Modify dataset to manage rotated text (?)
