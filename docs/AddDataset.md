@@ -35,8 +35,8 @@ Create manually a `custom` folder inside `./data/`, it should look like this:
 - Inside the `train` and `test` folder put the required files explained [here](Dataset.md#dataset-format).
 
 - After this, the next steps are the same explained [here](#add-online-dataset) except:
-  - the `CONFIG` only specify the structure of the dataset and not the download links.
-  - the `_download()` function can be empty since it's a local dataset
+  - the `CONFIG` is empty
+  - the `_download()` function should be empty because it's a local dataset
 
 ## Add online dataset
 If you want to add `online` dataset follow this steps:
@@ -74,11 +74,11 @@ CONFIG = {
 - `[2]`: the class name must be in uppercase
 - `[3]`: the dataset is online so the labels and images are stored online. Implement the `_download()` function that stores the data in the necessary [format](Dataset.md#data-folder-structure) inside the `./data/` folder
 
-## Update config.json
-After creating the dataset class update the `./config/pipeline.json` to add the `custom` dataset, notice that if follow the same structure of the `CONFIG` file, so you can just copy it and modify the links with `y` or `n`.
+## Update pipeline.yaml
+After creating the dataset class update the `./config/pipeline.yaml` to add the `custom` dataset, notice that it follows the same structure of the `CONFIG` file, so you can just copy it and modify the links with `y` or `n`.
 ```yaml
 datasets:
     funsd: y
-    iam: n
+    iam:
     custom: y # set it to 'y' to include it in the generation process
 ```
