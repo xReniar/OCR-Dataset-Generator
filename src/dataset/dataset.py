@@ -98,7 +98,7 @@ class Dataset(ABC):
             if len(self.config.keys()) > 0:
                 print(f"  [—] {self.__str__()} dataset already downloaded")
             else:
-                print(f"  [—] {self.__str__()} local dataset ready")
+                print(f"  [—] {self.__str__()} dataset ready")
 
     def _adjust_label_name(
         self
