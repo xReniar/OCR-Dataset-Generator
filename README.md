@@ -102,5 +102,5 @@ Below are shown the details of the output folders generated after the training d
 - [Add new Generator](./docs/AddGenerator.md)
 
 ## Future developments
-- Add workflow for data augmentation
+- Add workflow for data augmentation (albumentations)
 - Modify dataset to manage rotated text (?)
