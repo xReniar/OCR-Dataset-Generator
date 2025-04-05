@@ -36,7 +36,7 @@ class CORD(Dataset):
                 image = sample["image"]
                 labels: list = gt["valid_line"]
 
-                new_fn = f"img_{img_name}"
+                new_fn = f"cord_img_{img_name}"
                 with open(os.path.join(self.path(), split, "labels", f"{new_fn}.txt"), "w") as file:
                     for label in labels:
                         words = label["words"]
