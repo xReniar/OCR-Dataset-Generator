@@ -46,7 +46,7 @@ To generate the training data check the `./config/pipeline.yaml` first. This yam
     rec:
   ```
 - `dict`: path to a `.txt` file containing the set of characters to be included in the training data. The default is `./dict/en_dict.txt`. Both the generation and draw-label steps will follow the specified `dict`. If left empty, all characters will be included.
-- `datasets`: specifies which datasets are going to be used for the generation of the training data. To select the dataset just set it to `y` otherwise set it to `n`, example below:
+- `datasets`: specifies which datasets are going to be used for the generation of the training data. To select the dataset just set it to `y` otherwise leave it empty, example below:
   ```yaml
   # this example selects SROIE and XFUND-ES dataset and combines them
   sroie: y
