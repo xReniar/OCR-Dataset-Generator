@@ -19,7 +19,7 @@ This is the structure of the generated training data (suppose that both `detecti
                 ├── images
                 └── labels.json
 ```
-Download the [docTR](https://github.com/mindee/doctr) repository before performing the instruction below.
+Clone the [docTR](https://github.com/mindee/doctr) repository before performing the instruction below.
 ## Text Detection training
 To start the training just run `train_pytorch.py` or `train_tensorflow.py` situated in `doctr/references/detection`, 
 ```bash
