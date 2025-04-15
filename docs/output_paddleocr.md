@@ -32,6 +32,7 @@ Eval:
 ```
 And to start the training:
 ```bash
+cd PaddleOCR
 # put the correct configuration file 
 python3 tools/train.py -c configs/det/"selected_config".yml
 ```
@@ -39,6 +40,7 @@ python3 tools/train.py -c configs/det/"selected_config".yml
 ```bash
 # put the correct configuration file
 # replace "{test-name}" with the correct folder name 
+cd PaddleOCR
 python3 tools/train.py \
     -c configs/det/"selected_config".yml \
     -o Train.dataset.data_dir=./train_data/{test-name}-paddleocr \
@@ -62,6 +64,7 @@ Eval:
 ```
 And to start the training:
 ```bash
+cd PaddleOCR
 # put the correct configuration file
 python3 tools/train.py -c configs/rec/"selected_config".yml
 ```
@@ -69,6 +72,7 @@ python3 tools/train.py -c configs/rec/"selected_config".yml
 ```bash
 # put the correct configuration file 
 # replace "{test-name}" with the correct folder name
+cd PaddleOCR
 python3 tools/train.py \
     -c configs/rec/"selected_config".yml \
     -o Train.dataset.data_dir=./train_data/{test-name}-paddleocr \
