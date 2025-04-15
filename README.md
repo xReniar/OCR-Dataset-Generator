@@ -64,7 +64,7 @@ After selecting the datasets and the task it's possible to start generating the 
 python3 main.py --generate
 python3 main.py --draw
 ```
-After the generation process check `Data output`(#data-output), these are instructions on how to use the generated dataset if the user does not how to start the training process.
+After the generation process read this [instructions](#data-output), these are instructions on how to use the generated dataset if the user does not how to start the training process.
 
 Before generating the training data or drawing the labels there is an `error-checking` step, which basically checks for missing labels or missing images or wrong bounding box coordinates. If there are some errors a `./error.json` file will be created with this structure:
 ```json
