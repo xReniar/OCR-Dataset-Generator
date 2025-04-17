@@ -14,6 +14,7 @@ class Generator(ABC):
         test_name: str,
         datasets : list[str],
         lang: list[str] | None,
+        workers: int,
         transforms
     ) -> None:
         super().__init__()
@@ -29,6 +30,7 @@ class Generator(ABC):
         self.test_name = test_name
         self.datasets:list[str] = new_datasets
         self.lang = lang
+        self.workers = workers
         self.transforms = transforms
 
     def name(
