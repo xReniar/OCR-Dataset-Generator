@@ -14,6 +14,7 @@ def pipeline(
     tasks: dict,
     datasets: dict,
     lang: list[str] | None,
+    workers: int,
     augmentation_config,
     args
 ) -> None:
@@ -72,6 +73,7 @@ def pipeline(
                 test_name = test_name,
                 datasets = list(datasets.keys()),
                 lang = lang,
+                workers = workers,
                 transforms = augmentation_config
             )
             ocr_generator.generate_data(tasks)
@@ -98,6 +100,7 @@ if __name__ == "__main__":
     TEST_NAME: str = pipeline_config["test-name"]
     OCR_SYSTEM: str = pipeline_config["ocr-system"]
     dict_path: str | None = pipeline_config["dict"]
+    WORKERS: int = pipeline_config["workers"]   
     DICT = list(map(lambda x: x.split("\n")[0], open(dict_path, "r").readlines())) if dict_path != None else None
 
     datasets: dict = pipeline_config["datasets"]
@@ -130,12 +133,17 @@ if __name__ == "__main__":
         print("  [✗] Select at least one task. All the tasks are set to None")
         exit()
 
+    if WORKERS < 1:
+        print(" [✗] The number of workers must be greater than 0")
+        exit()
+
     pipeline(
         test_name = TEST_NAME,
         ocr_system = OCR_SYSTEM,
         tasks = TASKS,
         datasets = selected_datasets,
         lang = DICT,
+        workers = WORKERS,
         augmentation_config = augmentation_config,
         args = args
     )
