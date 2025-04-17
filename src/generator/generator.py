@@ -13,7 +13,7 @@ class Generator(ABC):
         self,
         test_name: str,
         datasets : list[str],
-        lang: list[str] | None,
+        dict: list[str] | None,
         workers: int,
         transforms
     ) -> None:
@@ -29,7 +29,7 @@ class Generator(ABC):
 
         self.test_name = test_name
         self.datasets:list[str] = new_datasets
-        self.lang = lang
+        self.dict = dict
         self.workers = workers
         self.transforms = transforms
 
@@ -45,7 +45,7 @@ class Generator(ABC):
         print("\nCreating dataloader")
         dataloader = Dataloader(
             datasets = self.datasets,
-            lang = self.lang
+            dict = self.dict
         )
         print("Dataloader created\n")
         print(f"Generating training data for {self.name()}")
