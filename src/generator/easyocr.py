@@ -8,12 +8,14 @@ class EasyOCRGenerator(Generator):
         test_name: str,
         datasets: list, 
         lang: list[str] | None,
+        workers: int,
         transforms = None
     ) -> None:
         super().__init__(
             test_name,
             datasets,
             lang,
+            workers,
             transforms
         )
 

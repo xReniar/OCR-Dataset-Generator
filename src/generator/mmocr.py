@@ -13,12 +13,14 @@ class MMOCRGenerator(Generator):
         test_name: str,
         datasets: list,
         lang: list[str] | None,
+        workers: int,
         transforms = None
     ) -> None:
         super().__init__(
             test_name,
             datasets,
             lang,
+            workers,
             transforms
         )
 
@@ -37,7 +39,7 @@ class MMOCRGenerator(Generator):
 
             args = [(img_output_path, img_path, gt) for (img_path, gt) in dataloader.data[split]]
 
-            with multiprocessing.Pool(processes=os.cpu_count()) as pool:
+            with multiprocessing.Pool(processes=self.workers) as pool:
                 results = pool.starmap(process, args)
 
             with open(os.path.join(root_path, f"{split}.json"), "w") as file:
