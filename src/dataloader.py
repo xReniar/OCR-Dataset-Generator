@@ -30,7 +30,7 @@ class Dataloader(ABC):
             for path in root_paths:
                 full_paths += [os.path.join(path, fn) for fn in os.listdir(path)]
 
-            with multiprocessing.Pool(processes=os.cpu_count()) as pool:
+            with multiprocessing.Pool(processes=self._workers) as pool:
                 self.data[split] = self.__filter__(pool.map(reader.read_label, full_paths))
     
     def __filter__(
