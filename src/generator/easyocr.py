@@ -22,8 +22,7 @@ class EasyOCRGenerator(Generator):
     def _generate(
         self,
         dataloader: Dataloader,
-        task: str,
-        process
+        task: str
     ) -> None:
         pass
 
@@ -31,7 +30,8 @@ class EasyOCRGenerator(Generator):
         self,
         img_output_path: str,
         img_path: str,
-        gt: list
+        gt: list,
+        transform: tuple[str, callable] = (None, None)
     ) -> None:
         pass
 
@@ -39,6 +39,7 @@ class EasyOCRGenerator(Generator):
         self,
         img_output_path: str,
         img_path: str,
-        gt: list
+        gt: list,
+        transform: tuple[str, callable] = (None, None)
     ) -> None:
         pass
