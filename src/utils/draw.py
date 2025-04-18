@@ -1,5 +1,6 @@
 from ..dataloader import Dataloader
-from PIL import Image, ImageDraw
+from .image import open_image
+from PIL import ImageDraw
 import multiprocessing
 import progressbar
 import threading
@@ -11,6 +12,13 @@ def draw_labels(
     datasets: list[str],
     lang: list[str]
 ) -> None:
+    """
+    Draws the labels of the images in the specified datasets.
+    
+    Args:
+        datasets (list[str]): List of dataset names.
+        lang (list[str]): List of languages.
+    """
     new_datasets = []
     for dataset in datasets:
         if "-" in dataset:
@@ -24,7 +32,7 @@ def draw_labels(
     for dataset in new_datasets:
         dataloaders[dataset] = Dataloader(
             datasets = [dataset],
-            lang = lang
+            dict = lang
         )
     print("Dataloader created\n")
 
@@ -75,10 +83,18 @@ def draw_single_img(
     color: str,
     width: int
 ) -> None:
+    """
+    Draws labels on an image and saves it to the output directory.
+
+    Args:
+        img_path (str): Path to the input image.
+        labels (list): List of labels to draw on the image.
+        output_dir (str): Directory to save the output image.
+        color (str): Color of the bounding boxes.
+        width (int): Width of the bounding boxes.
+    """
     _, img_name = os.path.split(img_path)
-    img = Image.open(img_path)
-    if img.mode == 'RGBA':
-        img = img.convert('RGB')
+    img = open_image(img_path)
 
     draw = ImageDraw.Draw(img)
 
