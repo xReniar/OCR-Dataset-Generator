@@ -20,6 +20,9 @@ class Dataloader(ABC):
         self.load_data()
 
     def load_data(self) -> None:
+        """
+        Loads the data from the datasets.
+        """
         for split in ["train", "test"]:
             root_paths = [os.path.join("data", dataset, split, "labels") for dataset in self.datasets]
 
@@ -34,6 +37,15 @@ class Dataloader(ABC):
         self,
         labels: list[tuple[str, list[tuple[str, list[int]]]]]
     ) -> list[tuple[str, list[tuple[str, list[int]]]]]:
+        """
+        Filters the labels based on the dictionary. If the dictionary is None, it returns the labels as is.
+
+        Args:
+            labels (list[tuple[str, list[tuple[str, list[int]]]]]): The labels to filter.
+        
+        Returns:
+            list[tuple[str, list[tuple[str, list[int]]]]]: The filtered labels.
+        """
         if self.dict != None:
             new_labels = []
             for (img_name, img_labels) in labels:
