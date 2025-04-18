@@ -2,9 +2,9 @@ from .generator import Generator
 from ..utils.image import open_image
 from ..dataloader import Dataloader
 from pathlib import Path
-import multiprocessing
-import os
 import json
+import os
+import cv2
 
 
 class MMOCRGenerator(Generator):
@@ -27,8 +27,7 @@ class MMOCRGenerator(Generator):
     def _generate(
         self,
         dataloader: Dataloader,
-        task: str,
-        process
+        task: str
     ) -> None:
         root_path = os.path.join(self.root_path, task)
         os.makedirs(root_path, exist_ok=True)
@@ -37,10 +36,7 @@ class MMOCRGenerator(Generator):
             img_output_path = os.path.join(root_path, "imgs", split)
             os.makedirs(img_output_path, exist_ok=True)
 
-            args = [(img_output_path, img_path, gt) for (img_path, gt) in dataloader.data[split]]
-
-            with multiprocessing.Pool(processes=self.workers) as pool:
-                results = pool.starmap(process, args)
+            results = self.run_process(img_output_path, dataloader, task, split)
 
             with open(os.path.join(root_path, f"{split}.json"), "w") as file:
                 labels = {}
@@ -68,12 +64,16 @@ class MMOCRGenerator(Generator):
         self,
         img_output_path: str,
         img_path: str,
-        gt: list
+        gt: list,
+        transform: tuple[str, callable] = (None, None)
     ) -> dict:
-        img = open_image(img_path)
+        img = open_image(img_path, transform[1])
 
         _, img_name = os.path.split(img_path)
-        img.save(os.path.join(img_output_path, img_name))
+        if transform[0] is not None:
+            img_name = img_name.replace(".", f"-{transform[0]}.")
+        
+        cv2.imwrite(os.path.join(img_output_path, img_name), img)
 
         split = Path(img_output_path).parts[-1]
         instances = []
@@ -89,10 +89,9 @@ class MMOCRGenerator(Generator):
         result = dict(
             instances = instances,
             img_path = os.path.join("imgs", split, img_name),
-            width = img.width,
-            height = img.height
+            width = img.shape[1],
+            height = img.shape[0]
         )
-        img.close()
 
         return result
 
@@ -100,24 +99,27 @@ class MMOCRGenerator(Generator):
         self,
         img_output_path: str,
         img_path: str,
-        gt: list
+        gt: list,
+        transform: tuple[str, callable] = (None, None)
     ) -> list[dict]:
-        img = open_image(img_path)
+        img = open_image(img_path, transform[1])
 
         _, img_name = os.path.split(img_path)
         split = Path(img_output_path).parts[-1]
 
         data_list = []
         for i, (text, bbox) in enumerate(gt):
-            crop = img.crop(bbox)
-            crop_name = img_name.replace(".", f"-{i}.")
-            crop.save(os.path.join(img_output_path, crop_name))
-            crop.close()
+            crop = img[bbox[1]:bbox[3], bbox[0]:bbox[2]]
+            if transform[0] is not None:
+                crop_name = img_name.replace(".", f"-{i}-{transform[0]}.")
+            else:
+                crop_name = img_name.replace(".", f"-{i}.")
+                
+            cv2.imwrite(os.path.join(img_output_path, crop_name), crop)
 
             data_list.append(dict(
                 instances = [{"text": text}],
-                img_path = os.path.join("imgs", split, img_name)
+                img_path = os.path.join("imgs", split, crop_name)
             ))
-        img.close()
         
         return data_list
