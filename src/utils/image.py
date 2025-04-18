@@ -22,8 +22,7 @@ def open_image(
 
     cv_image = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
     img.close()
-
     if transform is not None:
         cv_image = transform(image=cv_image)["image"]
-        
+    
     return cv_image
