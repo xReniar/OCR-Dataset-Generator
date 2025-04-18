@@ -13,17 +13,17 @@ workers: 8
 
 # list of dataset to select
 datasets:
-    cord: y
+    cord:
     funsd: y
-    gnhk: y
-    iam: y
+    gnhk:
+    iam:
     sroie:
     xfund:
-        xfund-de: y
+        xfund-de:
         xfund-es:
-        xfund-fr: y
-        xfund-it: y
-        xfund-ja: y
-        xfund-pt: y
-        xfund-zh: y
-    wildreceipt: y
+        xfund-fr:
+        xfund-it:
+        xfund-ja:
+        xfund-pt:
+        xfund-zh:
+    wildreceipt:
