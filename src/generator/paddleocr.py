@@ -1,6 +1,6 @@
 from .generator import Generator
 from ..dataloader import Dataloader
-from PIL import Image
+from ..utils.image import open_image
 from pathlib import Path
 import multiprocessing
 import os
@@ -54,9 +54,7 @@ class PaddleOCRGenerator(Generator):
         img_path: str,
         gt: list
     ) -> str:
-        img = Image.open(img_path)
-        if img.mode == 'RGBA':
-            img = img.convert('RGB')
+        img = open_image(img_path)
             
         _, img_name = os.path.split(img_path)
         img.save(os.path.join(img_output_path, img_name))
@@ -79,9 +77,7 @@ class PaddleOCRGenerator(Generator):
         img_path: str,
         gt: list
     ) -> list[tuple[str, str]]:
-        img = Image.open(img_path)
-        if img.mode == 'RGBA':
-            img = img.convert('RGB')
+        img = open_image(img_path)
 
         _, img_name = os.path.split(img_path)
         split = Path(img_output_path).parts[-1]

@@ -1,6 +1,6 @@
 from .generator import Generator
 from ..dataloader import Dataloader
-from PIL import Image
+from ..utils.image import open_image
 import multiprocessing
 import os
 
@@ -54,9 +54,7 @@ class YOLOTrOCRGenerator(Generator):
         img_path: str,
         gt: list
     ) -> None:
-        img = Image.open(img_path)
-        if img.mode == 'RGBA':
-            img = img.convert('RGB')
+        img = open_image(img_path)
 
         _, img_name = os.path.split(img_path)
         img_id = img_name.split(".")[0]
@@ -82,9 +80,7 @@ class YOLOTrOCRGenerator(Generator):
         img_path: str,
         gt: list
     ) -> list[str]:
-        img = Image.open(img_path)
-        if img.mode == 'RGBA':
-            img = img.convert('RGB')
+        img = open_image(img_path)
 
         _, img_name = os.path.split(img_path)
         result = []
