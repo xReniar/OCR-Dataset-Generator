@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 from ..dataloader import Dataloader
+from ..augmenter import DataAugmenter
+import multiprocessing
 import progressbar
 import threading
 import time
@@ -15,7 +17,7 @@ class Generator(ABC):
         datasets : list[str],
         dict: list[str] | None,
         workers: int,
-        transforms
+        augmentation: bool
     ) -> None:
         super().__init__()
 
@@ -31,7 +33,7 @@ class Generator(ABC):
         self.datasets:list[str] = new_datasets
         self.dict = dict
         self.workers = workers
-        self.transforms = transforms
+        self.transforms = [None] + DataAugmenter.get_operations() if augmentation else [None]
 
     def name(
         self
@@ -86,6 +88,21 @@ class Generator(ABC):
                 generating = False
                 progress_thread.join()
 
+    def run_process(
+        self,
+        img_output_path: str,
+        dataloader: Dataloader,
+        task: str
+    ):
+        results = []
+        process_map = { "Detection": self._det, "Recognition": self._rec }
+        for transform in self.transforms:
+            args = [(img_output_path, img_path, gt, transform) for (img_path, gt) in dataloader.data[task]]
+
+            with multiprocessing.Pool(processes=self.workers) as pool:
+                results += pool.starmap(process_map[task], args)
+        
+        return results
 
     @abstractmethod
     def _generate(self, dataloader: Dataloader, task: str, process) -> None:
