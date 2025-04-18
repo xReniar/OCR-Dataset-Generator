@@ -1,6 +1,7 @@
 albumentations
 datasets
 gdown
+opencv-python
 pillow
 progressbar
 wheel
