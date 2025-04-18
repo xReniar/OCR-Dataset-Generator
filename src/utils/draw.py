@@ -1,10 +1,10 @@
 from ..dataloader import Dataloader
 from .image import open_image
-from PIL import ImageDraw
 import multiprocessing
 import progressbar
 import threading
 import time
+import cv2
 import os
 
 
@@ -51,7 +51,7 @@ def draw_labels(
                     img_path,
                     labels,
                     split_draw_path,
-                    "black",
+                    (0, 0, 0),
                     1
                 ))
 
@@ -80,8 +80,8 @@ def draw_single_img(
     img_path: str,
     labels: list,
     output_dir: str,
-    color: str,
-    width: int
+    color: tuple[int, int, int],
+    thickness: int
 ) -> None:
     """
     Draws labels on an image and saves it to the output directory.
@@ -90,20 +90,19 @@ def draw_single_img(
         img_path (str): Path to the input image.
         labels (list): List of labels to draw on the image.
         output_dir (str): Directory to save the output image.
-        color (str): Color of the bounding boxes.
-        width (int): Width of the bounding boxes.
+        color (tuple[int, int, int]): Color of the bounding boxes in BGR format.
+        thickness (int): Thickness of the bounding boxes.
     """
     _, img_name = os.path.split(img_path)
     img = open_image(img_path)
 
-    draw = ImageDraw.Draw(img)
-
     for (_, bbox) in labels:
-        draw.rectangle(
-            xy = bbox,
-            outline = color,
-            width = width
+        cv2.rectangle(
+            img,
+            pt1 = (int(bbox[0]), int(bbox[1])),
+            pt2 = (int(bbox[2]), int(bbox[3])),
+            color = color,
+            thickness = thickness
         )
 
-    img.save(os.path.join(output_dir, img_name))
-    img.close()
+    cv2.imwrite(os.path.join(output_dir, img_name), img)
