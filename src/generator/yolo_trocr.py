@@ -58,7 +58,7 @@ class YOLOTrOCRGenerator(Generator):
 
         img_id = img_name.split(".")[0]
 
-        cv2.imwrite(os.path.join(img_output_path, img_name), img)
+        cv2.imwrite(os.path.join(img_output_path, "images" ,img_name), img)
         width, height = img.shape[1], img.shape[0]
 
         with open(os.path.join(img_output_path, "labels", f"{img_id}.txt"), "w") as file:
