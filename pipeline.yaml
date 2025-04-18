@@ -2,6 +2,11 @@ test-name: train-data
 ocr-system: paddleocr
 augmentation: False
 
+# draw settings
+draw-process:
+    color: [0, 0, 0]
+    thickness: 2
+
 # task to execute
 tasks:
     det: y
