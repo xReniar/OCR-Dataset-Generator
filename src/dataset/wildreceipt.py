@@ -35,10 +35,11 @@ class WILDRECEIPT(Dataset):
     def process_data(
         self,
         file_name_path: str,
+        index: int,
         split: str,
         annotations: list
     ) -> None:
-        _, file_name = os.path.split(file_name_path)
+        file_name = f"wildreceipt_img_{index}.jpeg"
         shutil.move(
             os.path.join(self.path(), "wildreceipt", file_name_path),
             os.path.join(self.path(), split, "images", file_name)
@@ -72,11 +73,12 @@ class WILDRECEIPT(Dataset):
             labels = open(os.path.join(extract_path, f"{split}.txt"), "r").readlines()
             labels = list(map(lambda row: row.split("\n")[0], labels))
 
-            for instance in labels:
+            for index, instance in enumerate(labels):
                 label = json.loads(instance)
 
                 args.append((
                     label["file_name"],
+                    index,
                     split,
                     label["annotations"]
                 ))
