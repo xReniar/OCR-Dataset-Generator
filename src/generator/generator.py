@@ -36,9 +36,21 @@ class Generator(ABC):
     def name(
         self
     ) -> str:
+        """
+        Returns the name of the generator in lowercase
+        """
         return self.__class__.__name__.lower().replace("generator","")
 
-    def generate_data(self, tasks:dict):
+    def generate_data(
+        self,
+        tasks: dict
+    ) -> None:
+        """
+        Generates the data for the given tasks.
+        Args:
+            tasks (dict): A dictionary with the tasks to generate.
+        
+        """
         self.root_path = os.path.join(self.base_path,f"{self.test_name}-{self.name()}")
         os.makedirs(self.root_path, exist_ok=True)
 
