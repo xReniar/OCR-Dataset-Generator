@@ -15,7 +15,7 @@ def pipeline(
     datasets: dict,
     lang: list[str] | None,
     workers: int,
-    augmentation_config,
+    augmentation: bool,
     args
 ) -> None:
     print("Downloading selected datasets")
@@ -74,7 +74,7 @@ def pipeline(
                 datasets = list(datasets.keys()),
                 dict = lang,
                 workers = workers,
-                transforms = augmentation_config
+                augmentation = augmentation
             )
             ocr_generator.generate_data(tasks)
 
@@ -94,7 +94,6 @@ def parse_args():
 
 if __name__ == "__main__":
     pipeline_config: dict = yaml.safe_load(open("./config/pipeline.yaml", "r"))
-    augmentation_config: dict = yaml.safe_load(open("./config/augmentation.yaml", "r"))
 
     TASKS: dict = pipeline_config["tasks"]
     TEST_NAME: str = pipeline_config["test-name"]
@@ -102,6 +101,7 @@ if __name__ == "__main__":
     dict_path: str | None = pipeline_config["dict"]
     WORKERS: int = pipeline_config["workers"]   
     DICT = list(map(lambda x: x.split("\n")[0], open(dict_path, "r").readlines())) if dict_path != None else None
+    AUGMENTATION: bool = pipeline_config["augmentation"]
 
     datasets: dict = pipeline_config["datasets"]
     defined_classes = list(map(lambda x: str(x).lower(), list(DATASETS.keys())))
@@ -144,6 +144,6 @@ if __name__ == "__main__":
         datasets = selected_datasets,
         lang = DICT,
         workers = WORKERS,
-        augmentation_config = augmentation_config,
+        augmentation = AUGMENTATION,
         args = args
     )
