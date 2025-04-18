@@ -84,9 +84,9 @@ class Generator(ABC):
                 progress_thread = threading.Thread(target=progress_bar, args=(task_name,))
                 progress_thread.start()
                 if task_name == "det":
-                    self._generate(dataloader, "Detection", self._det)
+                    self._generate(dataloader, "Detection")
                 elif task_name == "rec":
-                    self._generate(dataloader, "Recognition", self._rec)
+                    self._generate(dataloader, "Recognition")
                 generating = False
                 progress_thread.join()
 
