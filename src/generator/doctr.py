@@ -1,6 +1,6 @@
 from .generator import Generator
+from ..utils.image import open_image
 from ..dataloader import Dataloader
-from PIL import Image
 import multiprocessing
 import hashlib
 import json
@@ -14,14 +14,14 @@ class DoctrGenerator(Generator):
         datasets: list,
         dict: list[str] | None,
         workers: int,
-        transforms = None
+        augmentation: bool
     ) -> None:
         super().__init__(
             test_name,
             datasets,
             dict,
             workers,
-            transforms
+            augmentation
         )
 
     def _generate(
@@ -56,9 +56,7 @@ class DoctrGenerator(Generator):
         img_path: str,
         gt: list
     ) -> tuple[str, dict]:
-        img = Image.open(img_path)
-        if img.mode == 'RGBA':
-            img = img.convert('RGB')
+        img = open_image(img_path)
         _, img_name = os.path.split(img_path)
 
         polygons = []
@@ -86,9 +84,7 @@ class DoctrGenerator(Generator):
         img_path: str,
         gt: list
     ) -> list[tuple[str, str]]:
-        img = Image.open(img_path)
-        if img.mode == 'RGBA':
-            img = img.convert('RGB')
+        img = open_image(img_path)
 
         _, img_name = os.path.split(img_path)
 

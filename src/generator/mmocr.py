@@ -14,14 +14,14 @@ class MMOCRGenerator(Generator):
         datasets: list,
         dict: list[str] | None,
         workers: int,
-        transforms = None
+        augmentation: bool
     ) -> None:
         super().__init__(
             test_name,
             datasets,
             dict,
             workers,
-            transforms
+            augmentation
         )
 
     def _generate(
