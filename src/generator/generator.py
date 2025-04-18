@@ -33,7 +33,9 @@ class Generator(ABC):
         self.datasets:list[str] = new_datasets
         self.dict = dict
         self.workers = workers
-        self.transforms = [None] + DataAugmenter.get_operations() if augmentation else [None]
+
+        dataAugmenter = DataAugmenter()
+        self.transforms = [(None, None)] + dataAugmenter.get_operations() if augmentation else [(None, None)]
 
     def name(
         self
@@ -92,12 +94,14 @@ class Generator(ABC):
         self,
         img_output_path: str,
         dataloader: Dataloader,
-        task: str
+        task: str,
+        split: str
     ):
-        results = []
         process_map = { "Detection": self._det, "Recognition": self._rec }
+        results = []
         for transform in self.transforms:
-            args = [(img_output_path, img_path, gt, transform) for (img_path, gt) in dataloader.data[task]]
+            operation = transform if transform else (None, None)
+            args = [(img_output_path, img_path, gt, operation) for (img_path, gt) in dataloader.data[split]]
 
             with multiprocessing.Pool(processes=self.workers) as pool:
                 results += pool.starmap(process_map[task], args)
@@ -105,7 +109,7 @@ class Generator(ABC):
         return results
 
     @abstractmethod
-    def _generate(self, dataloader: Dataloader, task: str, process) -> None:
+    def _generate(self, dataloader: Dataloader, task: str) -> None:
         pass
 
     @abstractmethod
