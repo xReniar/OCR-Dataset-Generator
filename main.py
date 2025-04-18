@@ -72,7 +72,7 @@ def pipeline(
             ocr_generator: Generator = OCR_SYSTEMS[ocr_system](
                 test_name = test_name,
                 datasets = list(datasets.keys()),
-                lang = lang,
+                dict = lang,
                 workers = workers,
                 transforms = augmentation_config
             )
