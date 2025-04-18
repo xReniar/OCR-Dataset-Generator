@@ -93,7 +93,7 @@ def parse_args():
     return args
 
 if __name__ == "__main__":
-    pipeline_config: dict = yaml.safe_load(open("./config/pipeline.yaml", "r"))
+    pipeline_config: dict = yaml.safe_load(open("pipeline.yaml", "r"))
 
     TASKS: dict = pipeline_config["tasks"]
     TEST_NAME: str = pipeline_config["test-name"]
