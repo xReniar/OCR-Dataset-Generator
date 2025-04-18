@@ -30,9 +30,10 @@ pip3 install -r requirements.txt
 ```
 
 # Generate training data
-To generate the training data check the `./config/pipeline.yaml` first. This yaml file contains:
+To generate the training data check the `pipeline.yaml` first. This yaml file contains:
 - `test-name`: the generated training data will be stored in `./output/{test-name}`
 - `ocr-system`: specifies the OCR system that will be trained, the choices are listed [here](#supported-ocr-tools)
+- `augmentation`: set it to `True` to augment data, `False` otherwise
 - `tasks`: specify if the training data is for `detection`, `recognition` or both. To select the task set it to `y` or leave it empty otherwise
   ```yaml
   # both detection and recognition data will be generated
@@ -88,6 +89,9 @@ Before generating the training data or drawing the labels there is an `error-che
   - `line`: line of the `.txt` where the bounding box is wrong
   - `text`: text associated to the wrong bounding box
   - `bbox`: values of the bounding box
+
+# Data Augmentation
+The data augmentation relies on the `Albumentations` module, check `./src/augmenter.py` to add more augmentations.
 
 # Data output
 Below are shown the details of the output folders generated after the training data generation, along with instructions on how to use them. The examples below assume that both tasks are selected.
