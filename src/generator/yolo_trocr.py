@@ -1,7 +1,7 @@
 from .generator import Generator
 from ..dataloader import Dataloader
 from ..utils.image import open_image
-import multiprocessing
+import cv2
 import os
 
 
@@ -25,8 +25,7 @@ class YOLOTrOCRGenerator(Generator):
     def _generate(
         self,
         dataloader: Dataloader,
-        task: str,
-        process
+        task: str
     ) -> None:
         root_path = os.path.join(self.root_path, task)
         os.makedirs(root_path, exist_ok=True)
@@ -38,10 +37,7 @@ class YOLOTrOCRGenerator(Generator):
                 os.makedirs(os.path.join(img_output_path, "images"), exist_ok=True)
                 os.makedirs(os.path.join(img_output_path, "labels"), exist_ok=True)
 
-            args = [(img_output_path, img_path, gt) for (img_path, gt) in dataloader.data[split]]
-
-            with multiprocessing.Pool(processes=self.workers) as pool:
-                results = pool.starmap(process, args)
+            results = self.run_process(img_output_path, dataloader, task, split)
 
             if task == "Recognition":
                 with open(os.path.join(root_path, f"{split}.txt"), "w") as file:
@@ -52,14 +48,18 @@ class YOLOTrOCRGenerator(Generator):
         self,
         img_output_path: str,
         img_path: str,
-        gt: list
+        gt: list,
+        transform: tuple[str, callable] = (None, None)
     ) -> None:
-        img = open_image(img_path)
-
+        img = open_image(img_path, transform[1])
         _, img_name = os.path.split(img_path)
+        if transform[0] is not None:
+            img_name = img_name.replace(".", f"-{transform[0]}.")
+
         img_id = img_name.split(".")[0]
-        img.save(os.path.join(img_output_path, "images", img_name))
-        width, height = img.width, img.height
+
+        cv2.imwrite(os.path.join(img_output_path, img_name), img)
+        width, height = img.shape[1], img.shape[0]
 
         with open(os.path.join(img_output_path, "labels", f"{img_id}.txt"), "w") as file:
             for (_, bbox) in gt:
@@ -72,24 +72,27 @@ class YOLOTrOCRGenerator(Generator):
                 # every text has label 0 (for now)
                 # "label_id = func(text)"" or the text is the label itself
                 file.write(f"0 {x_center} {y_center} {box_width} {box_height}\n")
-        img.close()
 
     def _rec(
         self,
         img_output_path: str,
         img_path: str,
-        gt: list
+        gt: list,
+        transform: tuple[str, callable] = (None, None)
     ) -> list[str]:
-        img = open_image(img_path)
+        img = open_image(img_path, transform[1])
+        _, img_name = os.path.split(img_path)
 
         _, img_name = os.path.split(img_path)
         result = []
         for i, (text, bbox) in enumerate(gt):
-            crop = img.crop(bbox)
-            crop_name = img_name.replace(".", f"-{i}.")
-            crop.save(os.path.join(img_output_path, crop_name))
-            crop.close()
-
+            crop = img[bbox[1]:bbox[3], bbox[0]:bbox[2]]
+            if transform[0] is not None:
+                crop_name = img_name.replace(".", f"-{i}-{transform[0]}.")
+            else:
+                crop_name = img_name.replace(".", f"-{i}.")
+                
+            cv2.imwrite(os.path.join(img_output_path, crop_name), crop)
             result.append(f"{crop_name} {text}\n")
         
         return result

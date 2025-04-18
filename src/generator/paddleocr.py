@@ -2,9 +2,9 @@ from .generator import Generator
 from ..dataloader import Dataloader
 from ..utils.image import open_image
 from pathlib import Path
-import multiprocessing
-import os
 import json
+import os
+import cv2
 
 
 class PaddleOCRGenerator(Generator):
@@ -27,8 +27,7 @@ class PaddleOCRGenerator(Generator):
     def _generate(
         self,
         dataloader: Dataloader,
-        task: str,
-        process
+        task: str
     ) -> None:
         root_path = os.path.join(self.root_path, task)
         os.makedirs(root_path, exist_ok=True)
@@ -37,10 +36,7 @@ class PaddleOCRGenerator(Generator):
             img_output_path = os.path.join(root_path, split)
             os.makedirs(img_output_path, exist_ok=True)
 
-            args = [(img_output_path, img_path, gt) for (img_path, gt) in dataloader.data[split]]
-
-            with multiprocessing.Pool(processes=self.workers) as pool:
-                results = pool.starmap(process, args)
+            results = self.run_process(img_output_path, dataloader, task, split)
 
             with open(os.path.join(root_path, f"{split}_label.txt"), "w") as file:
                 if task == "Recognition":
@@ -52,12 +48,16 @@ class PaddleOCRGenerator(Generator):
         self,
         img_output_path: str,
         img_path: str,
-        gt: list
+        gt: list,
+        transform: tuple[str, callable] = (None, None)
     ) -> str:
-        img = open_image(img_path)
-            
+        img = open_image(img_path, transform[1])
         _, img_name = os.path.split(img_path)
-        img.save(os.path.join(img_output_path, img_name))
+
+        if transform[0] is not None:
+            img_name = img_name.replace(".", f"-{transform[0]}.")
+
+        cv2.imwrite(os.path.join(img_output_path, img_name), img)
 
         split = Path(img_output_path).parts[-1]
         annotations = []
@@ -67,7 +67,6 @@ class PaddleOCRGenerator(Generator):
                 transcription=text,
                 points = [[x1, y1],[x2, y1],[x2, y2],[x1, y2]]
             ))
-        img.close()
 
         return f"{os.path.join('Detection', split, img_name)}\t{json.dumps(annotations, ensure_ascii=False)}\n"
 
@@ -75,20 +74,22 @@ class PaddleOCRGenerator(Generator):
         self,
         img_output_path: str,
         img_path: str,
-        gt: list
+        gt: list,
+        transform: tuple[str, callable] = (None, None)
     ) -> list[tuple[str, str]]:
-        img = open_image(img_path)
-
+        img = open_image(img_path, transform[1])
         _, img_name = os.path.split(img_path)
+
         split = Path(img_output_path).parts[-1]
         result = []
         for i, (text, bbox) in enumerate(gt):
-            crop = img.crop(bbox)
-            crop_name = img_name.replace(".", f"-{i}.")
-            crop.save(os.path.join(img_output_path, crop_name))
-            crop.close()
-
+            crop = img[bbox[1]:bbox[3], bbox[0]:bbox[2]]
+            if transform[0] is not None:
+                crop_name = img_name.replace(".", f"-{i}-{transform[0]}.")
+            else:
+                crop_name = img_name.replace(".", f"-{i}.")
+                
+            cv2.imwrite(os.path.join(img_output_path, crop_name), crop)
             result.append((os.path.join("Recognition", split, crop_name), text))
-        img.close()
         
         return result
