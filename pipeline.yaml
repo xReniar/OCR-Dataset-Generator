@@ -1,0 +1,29 @@
+test-name: train-data
+ocr-system: paddleocr
+augmentation: False
+
+# task to execute
+tasks:
+    det: y
+    rec: y
+
+# dictionary to use and number of workers
+dict: ./dict/en_dict.txt
+workers: 8
+
+# list of dataset to select
+datasets:
+    cord: y
+    funsd: y
+    gnhk: y
+    iam: y
+    sroie:
+    xfund:
+        xfund-de: y
+        xfund-es:
+        xfund-fr: y
+        xfund-it: y
+        xfund-ja: y
+        xfund-pt: y
+        xfund-zh: y
+    wildreceipt: y
