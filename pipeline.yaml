@@ -5,7 +5,7 @@ augmentation: False
 # draw settings
 draw-process:
     color: [0, 0, 0]
-    thickness: 2
+    thickness: 1
 
 # task to execute
 tasks:
