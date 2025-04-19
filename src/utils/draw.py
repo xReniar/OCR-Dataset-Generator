@@ -10,7 +10,9 @@ import os
 
 def draw_labels(
     datasets: list[str],
-    lang: list[str]
+    lang: list[str],
+    color: tuple[int, int, int] = (0, 0, 0),
+    thickness: int = 1
 ) -> None:
     """
     Draws the labels of the images in the specified datasets.
@@ -42,18 +44,12 @@ def draw_labels(
         os.makedirs(draw_folder_path, exist_ok=True)
 
         args = []
-        dataloader = dataloaders[dataset]
+        dataloader: Dataloader = dataloaders[dataset]
         for split in ["train", "test"]:
             split_draw_path = os.path.join(draw_folder_path, split)
             os.makedirs(split_draw_path, exist_ok=True)
             for (img_path, labels) in dataloader.data[split]:
-                args.append((
-                    img_path,
-                    labels,
-                    split_draw_path,
-                    (0, 0, 0),
-                    1
-                ))
+                args.append((img_path, labels, split_draw_path, color, thickness))
 
         drawing = True
         def progress_bar():
