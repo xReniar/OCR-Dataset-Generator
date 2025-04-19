@@ -128,7 +128,32 @@ Before generating the training data or drawing the labels there is an `error-che
   - `bbox`: values of the bounding box
 
 # Data Augmentation
-The data augmentation relies on [Albumentations](https://albumentations.ai/), check `./src/augmenter.py` to add more augmentations.
+The data augmentation relies on [Albumentations](https://albumentations.ai/), check `./src/augmenter.py` to add more augmentations. By default only the `blur` operation is applied if `augmentation` is set to `True`:
+```py
+self.transforms = {
+    "blur": A.Blur(
+        blur_limit=7,
+        p=1.0 # notice the probability "p" set to 1.0
+    )
+}
+```
+This means that for each image in the generated data there is another image with the `blur` operation applied (img_1.png, img_1_blur.png, img_2.png, img_2_blur.png, etc..). To add more operations for example a `skew` do this:
+```py
+self.transforms = {
+    "blur": A.Blur(
+        blur_limit=7,
+        p=1.0
+    ),
+    "skew": A.Affine(
+        shear={"x": (-15, 15), "y": (-10, 10)},
+        rotate=(-5, 5),
+        scale=(0.9, 1.1),
+        keep_ratio=True,
+        p=0.7
+    )
+}
+```
+This means for each image there will be a `img_blur.png` and a `img_skew.png` in the training data.
 
 # Data output
 Below are shown the details of the output folders generated after the training data generation, along with instructions on how to use them. The examples below assume that both tasks are selected.
