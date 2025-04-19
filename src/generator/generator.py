@@ -100,8 +100,7 @@ class Generator(ABC):
         process_map = { "Detection": self._det, "Recognition": self._rec }
         results = []
         for transform in self.transforms:
-            operation = transform if transform else (None, None)
-            args = [(img_output_path, img_path, gt, operation) for (img_path, gt) in dataloader.data[split]]
+            args = [(img_output_path, img_path, gt, transform) for (img_path, gt) in dataloader.data[split]]
 
             with multiprocessing.Pool(processes=self.workers) as pool:
                 results += pool.starmap(process_map[task], args)
