@@ -1,5 +1,5 @@
 # OCR dataset generator
-This project is a tool for downloading and managing `OCR` datasets, combining online and local sources. It supports the creation of training data for `text detection` and `text recognition` for various OCR tools.
+This project is a tool for downloading and managing `OCR` datasets, combining online and local sources. It supports the creation of training data for `text detection` and `text recognition` for various OCR tools. This project offers 2 types of operation and they are [data-generation](#training-data-generation-process) and [label-drawing](#bounding-box-drawing-process).
 
 <img src="./docs/Pipeline.png" width=100%>
 
@@ -19,7 +19,7 @@ This project is a tool for downloading and managing `OCR` datasets, combining on
 - `WILDRECEIPT`: https://paperswithcode.com/dataset/wildreceipt
 - `XFUND`: https://github.com/doc-analysis/XFUND (`de`,`es`,`fr`,`it`,`ja`,`pt`,`zh`)
 
-# Setup
+## Setup
 ```shell
 # clone the repository
 git clone https://github.com/xReniar/OCR-Dataset-Generator.git
@@ -28,45 +28,82 @@ git clone https://github.com/xReniar/OCR-Dataset-Generator.git
 cd OCR-Dataset-Generator
 pip3 install -r requirements.txt
 ```
+# Bounding Box Drawing Process
+This process draws bounding boxes on images using annotation files. The annotations are loaded from the `labels` folder of each dataset in `./data`. Before executing the drawing process, verify the following parameters in `./pipeline.yaml`:
+- `datasets`: Selected dataset directories (relative to ./data) to process (to select a dataset set it to `y`). Dataset not present in the `./data` folder will be downloaded first.
+- `draw-process`:
+  - `color`: Bounding box color in BGR format (e.g., [255, 0, 0] for red).
+  - `thickness`: Line width (in pixels).
+- `dict`: Path to a `.txt` file containing allowed characters. It acts like a filter, if the text does not contain any of the characters specified in the `.txt` file then the associated bounding box will not be drawn. If this field is left empty then all the bounding box are drawn.
+- `workers`: Number of parallel threads for processing (recommended 4, depends on the numbers of cores) 
+## Example
+Drawing `labels` of `CORD` dataset with black bounding boxes with thickness 2, using `en_dict.txt`:
+```yaml
+draw-process:
+    color: [0, 0, 0]
+    thickness: 2
 
-# Generate training data
-To generate the training data check the `pipeline.yaml` first. This yaml file contains:
-- `test-name`: the generated training data will be stored in `./output/{test-name}`
-- `ocr-system`: specifies the OCR system that will be trained, the choices are listed [here](#supported-ocr-tools)
-- `augmentation`: set it to `True` to augment data, `False` otherwise
-- `tasks`: specify if the training data is for `detection`, `recognition` or both. To select the task set it to `y` or leave it empty otherwise
-  ```yaml
-  # both detection and recognition data will be generated
-  tasks:
+dict: ./dict/en_dict.txt
+workers: 8
+
+# it's possible to draw bounding boxes for multiple datasets
+# just set to 'y' the dataset needed
+datasets:
+    cord: y
+    ....
+```
+To start the drawing process run this command:
+```bash
+python main.py --draw
+```
+If the process does not start check [error-checking](#error-checking). If the process terminates correctly a `cord` folder (the name depends on the selected dataset) will appear inside `./data`.
+
+# Training data Generation Process
+This process generates training data for the specified [ocr-tool](#supported-ocr-tools), the annotations are loaded from the `labels` folder of each dataset selected. Before generating the training data verify the following parameters in `./pipeline.yaml`:
+- `test-name`: Name identifier for this training data generation process
+- `ocr-system`: The OCR system being used for training data generation, the possible choices are listed [here](#supported-ocr-tools)
+- `augmentation`: Whether data augmentation is applied (True of False), check [data augmentation](#data-augmentation)
+- `tasks`: Task for the training data, set to `y` the necessary tasks
+- `dict`: Path to the dictionary file being used for the training data. It acts like a filter depending on the task (if left empty then all the bounding boxes and text will be included):
+  - for the `detection` task the bounding box will not be included in the generated data
+  - for the `recognition` task the text will not be included in the generated data
+- `workers`: Number of parallel threads for processing (depends on the numbers of cores) 
+- `datasets`: Selected dataset directories (relative to ./data) to use for the training-data generation (to select a dataset set it to `y`). Dataset not present in the `./data` folder will be downloaded first.
+
+## Example
+Generating training data with `CORD` and `SROIE` dataset for `paddleocr`. The data is for text detection and text recognition using `en_dict.txt` (No augmentation applied). The training data name is `example-test`:
+```yaml
+test-name: example-test
+ocr-system: paddleocr
+augmentation: false
+
+tasks:
     det: y
     rec: y
 
-  # only detection data will be generated
-  tasks:
-    det: y
-    rec:
-  ```
-- `dict`: path to a `.txt` file containing the set of characters to be included in the training data. The default is `./dict/en_dict.txt`. Both the generation and draw-label steps will follow the specified `dict`. If left empty, all characters will be included.
-- `datasets`: specifies which datasets are going to be used for the generation of the training data. To select the dataset just set it to `y` otherwise leave it empty, example below:
-  ```yaml
-  # this example selects SROIE and XFUND-ES dataset and combines them
-  sroie: y
-  xfund:
-    xfund-de:
-    xfund-es: y
-  ```
+dict: ./dict/en_dict.txt
+workers: 8
 
-After selecting the datasets and the task it's possible to start generating the training data by running `main.py`. The arguments that need to be passed are mutually exclusive and they are:
-- `--generate`: starts the pipeline and stores the training data inside `./output/{test-name}`
-- `--draw`: creates a folder named `./draw` that contains all the images with the bounding boxes drawn. This `draw` folder includes subfolders corresponding to each dataset specified in `datasets` field.
-
-```shell
-# examples
-python3 main.py --generate
-python3 main.py --draw
+datasets:
+    cord: y
+    sroie: y
 ```
-After the generation process read this [instructions](#data-output), these are instructions on how to use the generated dataset if the user does not how to start the training process.
+To start the drawing process run this command:
+```bash
+python main.py --generate
+```
+If the process does not start check [error-checking](#error-checking). If the process terminates correctly then an `output` folder will appear (read [here](#data-output) for instructions on how to use the training-data):
+```
+.
+└── output
+    └── example-test-paddleocr
+        ├── Detection
+        │   └── ....
+        └── Recognition
+            └── ....
+```
 
+# Error checking
 Before generating the training data or drawing the labels there is an `error-checking` step, which basically checks for missing labels or missing images or wrong bounding box coordinates. If there are some errors a `./error.json` file will be created with this structure:
 ```json
 {
@@ -91,7 +128,7 @@ Before generating the training data or drawing the labels there is an `error-che
   - `bbox`: values of the bounding box
 
 # Data Augmentation
-The data augmentation relies on the `Albumentations` module, check `./src/augmenter.py` to add more augmentations.
+The data augmentation relies on [Albumentations](https://albumentations.ai/), check `./src/augmenter.py` to add more augmentations.
 
 # Data output
 Below are shown the details of the output folders generated after the training data generation, along with instructions on how to use them. The examples below assume that both tasks are selected.
