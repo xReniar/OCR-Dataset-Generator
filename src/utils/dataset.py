@@ -59,7 +59,7 @@ def check_labels(
         for label_filename in labels_content.keys():
             for i, (text, bbox) in enumerate(labels_content[label_filename]):
                 x1, y1, x2, y2 = bbox
-                if not(x1 < x2 and y1 < y2) or any(point < 0 for point in bbox):
+                if not(x1 < x2 and y1 < y2) or any(point < 0 for point in bbox) or len(text) == 0:
                     errors[os.path.join(dataset_path, split, "labels", label_filename)] = dict(
                         line = i + 1,
                         text = text,
