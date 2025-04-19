@@ -16,6 +16,7 @@ def pipeline(
     lang: list[str] | None,
     workers: int,
     augmentation: bool,
+    draw_args: dict,
     args
 ) -> None:
     print("Downloading selected datasets")
@@ -66,7 +67,9 @@ def pipeline(
         if args.draw:
             draw_labels(
                 datasets = sorted(list(datasets.keys())),
-                lang=lang
+                lang = lang,
+                color = draw_args["color"],
+                thickness = draw_args["thickness"]
             )
         if args.generate:
             ocr_generator: Generator = OCR_SYSTEMS[ocr_system](
@@ -145,5 +148,6 @@ if __name__ == "__main__":
         lang = DICT,
         workers = WORKERS,
         augmentation = AUGMENTATION,
+        draw_args = pipeline_config["draw-process"],
         args = args
     )
