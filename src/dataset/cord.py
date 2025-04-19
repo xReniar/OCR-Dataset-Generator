@@ -41,9 +41,19 @@ class CORD(Dataset):
                     for label in labels:
                         words = label["words"]
                         for word in words:
-                            bbox = self.get_bbox(word["quad"])
+                            xm, ym, xM, yM = tuple(self.get_bbox(word["quad"]))
+                            # check if coordinates are within the image bounds
+                            if xm < 0:
+                                xm = 0
+                            if ym < 0:  
+                                ym = 0
+                            if xM > image.width:
+                                xM = image.width
+                            if yM > image.height:
+                                yM = image.height
+                            
                             text = word["text"]
-                            file.write(f"{text}\t{bbox}\n")
+                            file.write(f"{text}\t{[xm, ym, xM, yM]}\n")
 
                 image.save(os.path.join(self.path(), split, "images", f"{new_fn}.png"))
                 image.close()
