@@ -56,7 +56,7 @@ To start the drawing process run this command:
 ```bash
 python main.py --draw
 ```
-If the process does not start check [error-checking](#error-checking). If the process terminates correctly a `cord` folder (the name depends on the selected dataset) will appear inside `./data`.
+If the process does not start check [error-checking](#error-checking). If the process terminates correctly a `cord` folder (the name depends on the selected dataset) will appear inside `./draw`.
 
 # Training data Generation Process
 This process generates training data for the specified [ocr-tool](#supported-ocr-tools), the annotations are loaded from the `labels` folder of each dataset selected. Before generating the training data verify the following parameters in `./pipeline.yaml`:
