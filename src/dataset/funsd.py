@@ -53,7 +53,8 @@ class FUNSD(Dataset):
                 file_content = []
                 for label in annotation:
                     for word in label["words"]:
-                        file_content.append(f"{word['text']}\t{word['box']}\n")
+                        if len(word) > 0:
+                            file_content.append(f"{word['text']}\t{word['box']}\n")
                 file.writelines(file_content)
                 file.close()
 
