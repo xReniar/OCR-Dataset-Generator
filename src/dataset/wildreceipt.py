@@ -39,7 +39,7 @@ class WILDRECEIPT(Dataset):
         split: str,
         annotations: list
     ) -> None:
-        file_name = f"wildreceipt_img_{index}.jpeg"
+        file_name = f"wildreceipt_{split}_img_{index}.jpeg"
         shutil.move(
             os.path.join(self.path(), "wildreceipt", file_name_path),
             os.path.join(self.path(), split, "images", file_name)
