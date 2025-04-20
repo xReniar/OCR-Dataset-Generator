@@ -1,7 +1,6 @@
 from .generator import Generator
 from ..dataloader import Dataloader
 from ..utils.image import open_image
-import pandas as pd
 import cv2
 import os
 
@@ -40,6 +39,17 @@ class EasyOCRGenerator(Generator):
 
                 self.run_process(img_output_path, dataloader, task, split)
 
+            if task == "Recognition":
+                img_output_path = os.path.join(root_path, split, "images")
+                os.makedirs(img_output_path, exist_ok=True)
+
+                results = self.run_process(img_output_path, dataloader, task, split)
+                results = [item for sublist in results for item in sublist]
+
+                with open(os.path.join(root_path, split, "gt.txt"), "w") as file:
+                    for (img_name, label) in results:
+                        file.write(f"{os.path.join('images', img_name)}\t{label}\n")
+
     def _det(
         self,
         img_output_path: str,
@@ -49,12 +59,12 @@ class EasyOCRGenerator(Generator):
     ) -> None:
         img = open_image(img_path, transform[1])
         _, img_name = os.path.split(img_path)
-        img_id, _ = tuple(img_name.split("."))
-
-        label_output_path = img_output_path.replace("images", "localization_transcription_gt")
 
         if transform[0] is not None:
             img_name = img_name.replace(".", f"-{transform[0]}.")
+
+        img_id, _ = tuple(img_name.split("."))
+        label_output_path = img_output_path.replace("images", "localization_transcription_gt")
 
         with open(os.path.join(label_output_path, f"{img_id}.txt"), "w") as file:
             for (text, bbox) in gt:
