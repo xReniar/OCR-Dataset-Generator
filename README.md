@@ -5,7 +5,7 @@ This project is a tool for downloading and managing `OCR` datasets, combining on
 
 ## Supported OCR tools
 - `doctr`: https://github.com/mindee/doctr
-- `easyocr`: https://github.com/JaidedAI/EasyOCR (coming soon)
+- `easyocr`: https://github.com/JaidedAI/EasyOCR
 - `mmocr`: https://github.com/open-mmlab/mmocr
 - `paddleocr`: https://github.com/PaddlePaddle/PaddleOCR
 - `yolo+trocr`: [YOLO](https://github.com/ultralytics/yolov5), [TrOCR](https://arxiv.org/abs/2109.10282)
