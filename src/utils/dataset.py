@@ -18,21 +18,17 @@ def check_images(
         dictionaries containing the missing images and labels.
     """
     errors = {}
+    missing_labels = []
+    missing_images = []
     for split in ["train", "test"]:
         images_dir = set(map(lambda fn: fn.split(".")[0], sorted(os.listdir(os.path.join(dataset_path, split, "images")))))
         labels_dir = set(map(lambda fn: fn.split(".")[0], sorted(os.listdir(os.path.join(dataset_path, split, "labels")))))
 
-        missing_labels = images_dir - labels_dir
-        if len(missing_labels) < len(images_dir):
-            errors["missing_labels"] = list(missing_labels)
-        else:
-            errors["missing_labels"] = []
+        missing_labels += list(map(lambda fn: f"{split}/labels/{fn}", list(images_dir - labels_dir)))
+        missing_images += list(map(lambda fn: f"{split}/images/{fn}", list(labels_dir - images_dir)))
 
-        missing_images = labels_dir - images_dir
-        if len(missing_images) < len(labels_dir):
-            errors["missing_images"] = list(missing_images)
-        else:
-            errors["missing_images"] = []
+    errors["missing_labels"] = missing_labels
+    errors["missing_images"] = missing_images
     
     return errors
 

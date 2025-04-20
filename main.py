@@ -52,8 +52,8 @@ def pipeline(
 
         if not(len(missing_images) == 0 and len(missing_labels) == 0 and len(label_errors.keys()) == 0):
             errors[dataset_instance.__str__()] = dict(
-                missing_images = missing["missing_images"],
-                missing_labels = missing["missing_labels"],
+                missing_images = missing_images,
+                missing_labels = missing_labels,
                 label_checking = label_errors
             )
 
@@ -113,7 +113,7 @@ if __name__ == "__main__":
     if len(defined_classes) > len(config_classes):
         print("  [✗] There are some datasets that are not defined in the `pipeline.yaml`")
     if len(defined_classes) < len(config_classes):
-        print("  [✗] Some datasets in the `config.json` do not have a script in `./src/dataset/`")
+        print("  [✗] Some datasets in the `pipeline.yaml` do not have a script in `./src/dataset/`")
 
     selected_datasets = {}
     for dataset in config_classes:
