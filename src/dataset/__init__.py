@@ -1,11 +1,12 @@
-import os
+from .dataset import LocalDataset
 import importlib
+import os
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 dataset_files = [
     f[:-3] for f in os.listdir(current_dir)
-    if f.endswith(".py") and f not in ("__init__.py", "dataset.py")
+    if f.endswith(".py") and f not in ("__init__.py", "dataset.py", "_local.py", "_online.py")
 ]
 
 DATASETS = {}
@@ -21,4 +22,10 @@ for dataset_file in dataset_files:
     if hasattr(module, "CONFIG"):
         CONFIG[class_name] = getattr(module, "CONFIG")
 
-__all__ = ["DATASETS", "CONFIG"]
+
+
+__all__ = [
+    DATASETS,
+    CONFIG,
+    LocalDataset,
+]
