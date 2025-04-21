@@ -104,7 +104,7 @@ If the process does not start check [error-checking](#error-checking). If the pr
 ```
 
 # Error checking
-Before generating the training data or drawing the labels there is an `error-checking` step, which basically checks for missing labels or missing images or wrong bounding box coordinates. If there are some errors a `./error.json` file will be created with this structure:
+Before generating the training data or drawing the labels there is an `error-checking` step, which basically checks for missing labels or missing images or wrong bounding box coordinates. If there are some errors a `./errors.json` file will be created with this structure:
 ```json
 {
     "dataset-name" {
