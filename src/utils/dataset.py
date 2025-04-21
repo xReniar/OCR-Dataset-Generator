@@ -24,8 +24,11 @@ def check_images(
         images_dir = set(map(lambda fn: fn.split(".")[0], sorted(os.listdir(os.path.join(dataset_path, split, "images")))))
         labels_dir = set(map(lambda fn: fn.split(".")[0], sorted(os.listdir(os.path.join(dataset_path, split, "labels")))))
 
-        missing_labels += list(map(lambda fn: f"{split}/labels/{fn}", list(images_dir - labels_dir)))
-        missing_images += list(map(lambda fn: f"{split}/images/{fn}", list(labels_dir - images_dir)))
+        missing_labels += list(map(lambda fn: f"{split}/labels/{fn}.*.txt", list(images_dir - labels_dir)))
+        missing_labels += [f"no labels in '{split}/labels' folder"] if len(labels_dir) == 0 else []
+
+        missing_images += list(map(lambda fn: f"{split}/images/{fn}.* not", list(labels_dir - images_dir)))
+        missing_images += [f"no images in '{split}/images' folder"] if len(images_dir) == 0 else []
 
     errors["missing_labels"] = missing_labels
     errors["missing_images"] = missing_images
