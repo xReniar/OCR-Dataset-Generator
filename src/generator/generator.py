@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from ..dataloader import Dataloader
 from ..augmenter import DataAugmenter
+from yaspin import yaspin
+from yaspin.spinners import Spinners
+from colorama import Fore
 import multiprocessing
-import progressbar
-import threading
 import time
 import os
 
@@ -58,37 +59,30 @@ class Generator(ABC):
         self.root_path = os.path.join(self.base_path,f"{self.test_name}-{self.name()}")
         os.makedirs(self.root_path, exist_ok=True)
 
-        print("\nCreating dataloader")
-        dataloader = Dataloader(
-            datasets = self.datasets,
-            dict = self.dict
-        )
-        print("Dataloader created\n")
-        print(f"Generating training data for {self.name()}")
+        print(f"{Fore.LIGHTCYAN_EX}[Dataloader creation]{Fore.RESET}")
+        with yaspin(text=f"Creating dataloader", spinner=Spinners.line) as spinner:
+            dataloader = Dataloader(
+                datasets = self.datasets,
+                dict = self.dict
+            )
+            spinner.text = "Dataloader created"
+            spinner.ok(f"{Fore.GREEN}✓{Fore.RESET}")
+        print(f"- {len(dataloader.data['train'])} train images")
+        print(f"- {len(dataloader.data['test'])} test images\n")
 
-        generating = None
-        def progress_bar(task: str):
-            widgets = ["  [", progressbar.AnimatedMarker(), f"] Generating {task} data"]
-            bar = progressbar.ProgressBar(widgets=widgets, maxval=progressbar.UnknownLength).start()
-            i = 0
-            while generating:
-                i += 1
-                bar.update(i)
-                time.sleep(0.1)
-            bar.widgets =  [f"  [✓] Generated {task} data"]
-            bar.finish()
-
+        print(f"{Fore.LIGHTCYAN_EX}[Training data generation for {self.name()}]{Fore.RESET}")
         for task_name in tasks.keys():
-            generating = True
             if tasks[task_name] == "y":
-                progress_thread = threading.Thread(target=progress_bar, args=(task_name,))
-                progress_thread.start()
-                if task_name == "det":
-                    self._generate(dataloader, "Detection")
-                elif task_name == "rec":
-                    self._generate(dataloader, "Recognition")
-                generating = False
-                progress_thread.join()
+                with yaspin(text=f"Generating {task_name} data", spinner=Spinners.line) as spinner:
+                    start_time = time.time()
+                    if task_name == "det":
+                        self._generate(dataloader, "Detection")
+                    elif task_name == "rec":
+                        self._generate(dataloader, "Recognition")
+                    end_time = time.time()
+                    
+                    spinner.text = f"Generated {task_name} data in {end_time - start_time:.2f} s"
+                    spinner.ok(f"{Fore.GREEN}✓{Fore.RESET}")
 
     def run_process(
         self,
