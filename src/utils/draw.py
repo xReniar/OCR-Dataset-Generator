@@ -1,8 +1,9 @@
 from ..dataloader import Dataloader
 from .image import open_image
+from yaspin import yaspin
+from yaspin.spinners import Spinners
+from colorama import Fore
 import multiprocessing
-import progressbar
-import threading
 import time
 import cv2
 import os
@@ -11,6 +12,7 @@ import os
 def draw_labels(
     datasets: list[str],
     lang: list[str],
+    workers: int,
     color: tuple[int, int, int] = (0, 0, 0),
     thickness: int = 1
 ) -> None:
@@ -28,17 +30,19 @@ def draw_labels(
             new_datasets.append(os.path.join(root, dataset))
         else:
             new_datasets.append(dataset)
-    
-    print("\nCreating dataloader")
-    dataloaders = {}
-    for dataset in new_datasets:
-        dataloaders[dataset] = Dataloader(
-            datasets = [dataset],
-            dict = lang
-        )
-    print("Dataloader created\n")
+        
+    print(f"{Fore.LIGHTCYAN_EX}[Dataloader creation]{Fore.RESET}")
+    with yaspin(text=f"Creating dataloader", spinner=Spinners.line) as spinner:
+        dataloaders = {}
+        for dataset in new_datasets:
+            dataloaders[dataset] = Dataloader(
+                datasets = [dataset],
+                dict = lang
+            )
+        spinner.text = "Dataloader created\n"
+        spinner.ok(f"{Fore.GREEN}✓{Fore.RESET}")
 
-    print("Draw labels")
+    print(f"{Fore.LIGHTCYAN_EX}[Label drawing]{Fore.RESET}")
     for dataset in dataloaders.keys():
         draw_folder_path = os.path.join("draw", dataset)
         os.makedirs(draw_folder_path, exist_ok=True)
@@ -51,26 +55,14 @@ def draw_labels(
             for (img_path, labels) in dataloader.data[split]:
                 args.append((img_path, labels, split_draw_path, color, thickness))
 
-        drawing = True
-        def progress_bar():
-            widgets = ["  [", progressbar.AnimatedMarker(), f"] Drawing labels in \"draw/{dataset}\""]
-            bar = progressbar.ProgressBar(widgets=widgets, maxval=progressbar.UnknownLength).start()
-            i = 0
-            while drawing:
-                i += 1
-                bar.update(i)
-                time.sleep(0.1)
-            bar.widgets =  [f"  [✓] Finished drawing \"{dataset}\" labels"]
-            bar.finish()
+        with yaspin(text=f"Drawing labels in \"draw/{dataset}\"", spinner=Spinners.line) as spinner:
+            start_time = time.time()
+            with multiprocessing.Pool(processes=workers) as pool:
+                pool.starmap(draw_single_img, args)
+            end_time = time.time()
 
-        progress_thread = threading.Thread(target=progress_bar)
-        progress_thread.start()
-
-        with multiprocessing.Pool(processes=os.cpu_count()) as pool:
-            pool.starmap(draw_single_img, args)
-
-        drawing = False
-        progress_thread.join()
+            spinner.text = f"Finished drawing \"{dataset}\" labels in {end_time - start_time:.2f}s"
+            spinner.ok(f"{Fore.GREEN}✓{Fore.RESET}")
 
 def draw_single_img(
     img_path: str,
