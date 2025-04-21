@@ -1,4 +1,4 @@
-from .dataset import Dataset
+from .dataset import OnlineDataset
 import gdown
 import json
 import multiprocessing
@@ -14,7 +14,7 @@ CONFIG = {
     }
 }
 
-class GNHK(Dataset):
+class GNHK(OnlineDataset):
     def __init__(
             self,
             config

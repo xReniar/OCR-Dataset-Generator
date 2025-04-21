@@ -1,4 +1,4 @@
-from .dataset import Dataset
+from .dataset import OnlineDataset
 from datasets import load_dataset
 import os
 import json
@@ -8,7 +8,7 @@ CONFIG = {
     "cord": "naver-clova-ix/cord-v2"
 }
 
-class CORD(Dataset):
+class CORD(OnlineDataset):
     def __init__(
         self,
         config

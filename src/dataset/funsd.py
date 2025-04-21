@@ -1,4 +1,4 @@
-from .dataset import Dataset
+from .dataset import OnlineDataset
 import requests
 import zipfile
 import shutil
@@ -9,7 +9,7 @@ CONFIG = {
     "funsd": "https://guillaumejaume.github.io/FUNSD/dataset.zip"
 }
 
-class FUNSD(Dataset):
+class FUNSD(OnlineDataset):
     def __init__(
         self,
         config: dict

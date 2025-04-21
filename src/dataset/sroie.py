@@ -1,4 +1,4 @@
-from .dataset import Dataset
+from .dataset import OnlineDataset
 from datasets import load_dataset
 from PIL import Image
 import multiprocessing
@@ -15,7 +15,7 @@ CONFIG = {
 }
 
 
-class SROIE(Dataset):
+class SROIE(OnlineDataset):
     def __init__(
         self,
         config: dict

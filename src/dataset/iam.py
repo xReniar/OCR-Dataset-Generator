@@ -1,4 +1,4 @@
-from .dataset import Dataset
+from .dataset import OnlineDataset
 import requests
 import zipfile
 import os
@@ -13,7 +13,7 @@ CONFIG = {
     }
 }
 
-class IAM(Dataset):
+class IAM(OnlineDataset):
     def __init__(
         self,
         config: dict

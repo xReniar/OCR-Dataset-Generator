@@ -1,4 +1,4 @@
-from .dataset import Dataset
+from .dataset import OnlineDataset
 import multiprocessing
 import tarfile
 import requests
@@ -11,7 +11,7 @@ CONFIG = {
     "wildreceipt": "https://download.openmmlab.com/mmocr/data/wildreceipt.tar"
 }
 
-class WILDRECEIPT(Dataset):
+class WILDRECEIPT(OnlineDataset):
     def __init__(   
         self,
         config

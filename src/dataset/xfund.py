@@ -1,4 +1,4 @@
-from .dataset import Dataset
+from .dataset import OnlineDataset
 import requests
 import zipfile
 import os
@@ -16,7 +16,7 @@ CONFIG = {
 }
 
 
-class XFUND(Dataset):
+class XFUND(OnlineDataset):
     def __init__(
         self,
         config: dict
