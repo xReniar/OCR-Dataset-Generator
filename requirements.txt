@@ -1,7 +1,9 @@
 albumentations
+colorama
 datasets
 gdown
 opencv-python
 pillow
 progressbar
 wheel
+yaspin
