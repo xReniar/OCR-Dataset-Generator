@@ -1,7 +1,8 @@
-from src.dataset import DATASETS, CONFIG
+from src.dataset import DATASETS, CONFIG, LocalDataset
 from src.generator import *
 from src.utils.draw import draw_labels
 from src.utils. dataset import check_images, check_labels
+from colorama import Fore
 import argparse
 import os
 import json
@@ -19,7 +20,8 @@ def pipeline(
     draw_args: dict,
     args
 ) -> None:
-    print("Downloading selected datasets")
+    print(f"{Fore.LIGHTCYAN_EX}[Dataset Setup]{Fore.RESET}")
+
     
     # create dataset objects
     for dataset in datasets.keys():
@@ -29,18 +31,21 @@ def pipeline(
             dataset_instance.set_subdataset(dataset)
             datasets[dataset] = dataset_instance
         else:
-            datasets[dataset] = DATASETS[dataset.upper()](CONFIG[dataset.upper()])
+            if dataset.upper() not in DATASETS:
+                datasets[dataset] = LocalDataset(dict(__name__ = dataset))
+            else:
+                datasets[dataset] = DATASETS[dataset.upper()](CONFIG[dataset.upper()])
         
-        # download if necessary
+        # dataset setup
         dataset_instance = datasets[dataset]    
-        dataset_instance.download()
+        dataset_instance.setup()
 
     # check if all the labels have a corresponding image and viceversa
     # also check if there are wrong bounding boxes
     if os.path.isfile("./errors.json"):
         os.remove("./errors.json")
 
-    print("\nChecking errors")
+    print(f"\n{Fore.LIGHTCYAN_EX}[Error Checking step]{Fore.RESET}")
     errors = {}
     for dataset in datasets.keys():
         dataset_instance = datasets[dataset]
@@ -60,14 +65,15 @@ def pipeline(
     if len(list(errors.keys())) != 0:
         with open("errors.json", "w") as error_file:
             json.dump(errors, error_file, indent=4, ensure_ascii=False)
-        print("  [✗] Some bbox values are wrong, or some images or labels are missing. Details in `./errors.json`")
+        print(f"{Fore.RED}✗{Fore.RESET} Some bbox values are wrong, or some images or labels are missing. Details in {Fore.RED}./errors.json{Fore.RESET}")
     else:
-        print("  [✓] No errors in the selected datasets")
+        print(f"{Fore.GREEN}✓{Fore.RESET} No errors in the selected datasets\n")
 
         if args.draw:
             draw_labels(
                 datasets = sorted(list(datasets.keys())),
                 lang = lang,
+                workers = workers,
                 color = draw_args["color"],
                 thickness = draw_args["thickness"]
             )
@@ -110,11 +116,6 @@ if __name__ == "__main__":
     defined_classes = list(map(lambda x: str(x).lower(), list(DATASETS.keys())))
     config_classes = list(datasets.keys())
 
-    if len(defined_classes) > len(config_classes):
-        print("  [✗] There are some datasets that are not defined in the `pipeline.yaml`")
-    if len(defined_classes) < len(config_classes):
-        print("  [✗] Some datasets in the `pipeline.yaml` do not have a script in `./src/dataset/`")
-
     selected_datasets = {}
     for dataset in config_classes:
         value = datasets[dataset]
@@ -129,15 +130,15 @@ if __name__ == "__main__":
     args = parse_args()
         
     if len(selected_datasets.keys()) == 0:
-        print("  [✗] Select at least one dataset. No dataset selected")
+        print(f"{Fore.RED}✗{Fore.RESET} Select at least one dataset. No dataset selected")
         exit()
 
     if not(args.draw) and not(any(value == "y" for value in TASKS.values())):
-        print("  [✗] Select at least one task. All the tasks are set to None")
+        print(f"{Fore.RED}✗{Fore.RESET} Select at least one task. All the tasks are set to None")
         exit()
 
     if WORKERS < 1:
-        print(" [✗] The number of workers must be greater than 0")
+        print(f"{Fore.RED}✗{Fore.RESET} The number of workers must be greater than 0")
         exit()
 
     pipeline(
