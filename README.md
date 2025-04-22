@@ -28,7 +28,8 @@ git clone https://github.com/xReniar/OCR-Dataset-Generator.git
 cd OCR-Dataset-Generator
 pip3 install -r requirements.txt
 ```
-# Bounding Box Drawing Process
+# How to use
+## Bounding Box Drawing Process
 This process draws bounding boxes on images using annotation files. The annotations are loaded from the `labels` folder of each dataset in `./data`. Before executing the drawing process, verify the following parameters in `./pipeline.yaml`:
 - `datasets`: Selected dataset directories (relative to ./data) to process (to select a dataset set it to `y`). Dataset not present in the `./data` folder will be downloaded first.
 - `draw-process`:
@@ -36,8 +37,9 @@ This process draws bounding boxes on images using annotation files. The annotati
   - `thickness`: Line width (in pixels).
 - `dict`: Path to a `.txt` file containing allowed characters. It acts like a filter, if the text does not contain any of the characters specified in the `.txt` file then the associated bounding box will not be drawn. If this field is left empty then all the bounding box are drawn.
 - `workers`: Number of parallel threads for processing (recommended 4, depends on the numbers of cores) 
-## Example
-Drawing `labels` of `CORD` dataset with black bounding boxes with thickness 2, using `en_dict.txt`:
+<details><summary>Example</summary>
+
+Drawing labels of `CORD` dataset with black bounding boxes with thickness 2, using `en_dict.txt`:
 ```yaml
 draw-process:
     color: [0, 0, 0]
@@ -52,13 +54,16 @@ datasets:
     cord: y
     ....
 ```
+</details>
+
+
 To start the drawing process run this command:
 ```bash
 python main.py --draw
 ```
 If the process does not start check [error-checking](#error-checking). If the process terminates correctly a `cord` folder (the name depends on the selected dataset) will appear inside `./draw`.
 
-# Training data Generation Process
+## Training data Generation Process
 This process generates training data for the specified [ocr-tool](#supported-ocr-tools), the annotations are loaded from the `labels` folder of each dataset selected. Before generating the training data verify the following parameters in `./pipeline.yaml`:
 - `test-name`: Name identifier for this training data generation process
 - `ocr-system`: The OCR system being used for training data generation, the possible choices are listed [here](#supported-ocr-tools)
@@ -70,7 +75,7 @@ This process generates training data for the specified [ocr-tool](#supported-ocr
 - `workers`: Number of parallel threads for processing (depends on the numbers of cores) 
 - `datasets`: Selected dataset directories (relative to ./data) to use for the training-data generation (to select a dataset set it to `y`). Dataset not present in the `./data` folder will be downloaded first.
 
-## Example
+### Example
 Generating training data with `CORD` and `SROIE` dataset for `paddleocr`. The data is for text detection and text recognition using `en_dict.txt` (No augmentation applied). The training data name is `example-test`:
 ```yaml
 test-name: example-test
