@@ -109,7 +109,7 @@ This process generates training data for the specified [ocr-tool](#supported-ocr
 > ```
 > </details>
 
-To start the drawing process run this command:
+To start the generation process run this command:
 ```bash
 python main.py --generate
 ```
