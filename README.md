@@ -33,6 +33,9 @@ Below are the instructions on how to properly use this project. Each process req
 where you can specify key parameters such as the datasets to use, the character dictionary (dict), the tasks to perform, and more.
 Interactive examples (dropdown menus) are provided to guide through the configuration, along with the commands needed to launch each process.
 
+> [!NOTE]
+> If the process does not start check [error-checking](#error-checking). 
+
 ## Bounding Box Drawing Process
 This process draws bounding boxes on images using annotation files. The annotations are loaded from the `labels` folder of each dataset in `./data`. Before executing the drawing process, verify the following parameters in `./pipeline.yaml`:
 - `datasets`: Selected dataset directories (relative to ./data) to process (to select a dataset set it to `y`). Dataset not present in the `./data` folder will be downloaded first.
@@ -69,9 +72,6 @@ To start the drawing process run this command:
 python main.py --draw
 ```
 If the process terminates correctly a `cord` folder (the name depends on the selected dataset) will appear inside `./draw`.
-
-> [!NOTE]
-> If the process does not start check [error-checking](#error-checking). 
 
 ## Training data Generation Process
 This process generates training data for the specified [ocr-tool](#supported-ocr-tools), the annotations are loaded from the `labels` folder of each dataset selected. Before generating the training data verify the following parameters in `./pipeline.yaml`:
@@ -124,9 +124,6 @@ If the process terminates correctly then an `output` folder will appear (read [h
         └── Recognition
             └── ....
 ```
-
-> [!NOTE]
-> If the process does not start check [error-checking](#error-checking). 
 
 # Error checking
 Before generating the training data or drawing the labels there is an `error-checking` step, which basically checks for missing labels or missing images or wrong bounding box coordinates. If there are some errors a `./errors.json` file will be created with this structure:
