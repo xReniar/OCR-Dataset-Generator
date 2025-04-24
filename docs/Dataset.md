@@ -87,7 +87,7 @@ from .dataset import Dataset
 
 CONFIG = {...}
 
-class dataset(Dataset):
+class DATASET(Dataset):
     def __init__(
         self,
         config: dict
@@ -115,6 +115,6 @@ The `CONFIG` specify the download links for `images` and `labels`, defines also 
       "sub-2": "...",
   }
   ```
-- `dataset` class: takes only the `CONFIG` as input
+- `DATASET` class: takes only the `CONFIG` as input
 
 More information can be found [here](./AddDataset.md) 
