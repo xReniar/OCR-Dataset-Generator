@@ -26,8 +26,7 @@ def pipeline(
     # create dataset objects
     for dataset in datasets.keys():
         # dataset setup
-        dataset_instance = datasets[dataset]    
-        dataset_instance.setup()
+        datasets[dataset].setup()
 
     # check if all the labels have a corresponding image and viceversa
     # also check if there are wrong bounding boxes
