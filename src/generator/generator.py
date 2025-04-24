@@ -90,7 +90,7 @@ class Generator(ABC):
         dataloader: Dataloader,
         task: str,
         split: str
-    ):
+    ) -> list:
         process_map = { "Detection": self._det, "Recognition": self._rec }
         results = []
         for transform in self.transforms:
