@@ -1,5 +1,5 @@
 # Add new Dataset
-There are 2 possible types of dataset that is possible to add: `local` and `online`. In this tutorial suppose the name of the dataset you want to add is `custom`.
+There are 2 possible types of dataset that is possible to add: `local` and `online`. In this tutorial suppose the name of the dataset you want to add is `custom`. After adding the dataset read [here](#update-pipelineyaml)
 
 ## Add local dataset
 If you want to add `local` dataset follow this steps:
@@ -57,8 +57,8 @@ CONFIG = {
 - `[2]`: the class name must be in uppercase
 - `[3]`: the dataset is online so the labels and images are stored online. Implement the `_download()` function that stores the data in the necessary [format](Dataset.md#data-folder-structure) inside the `./data/` folder
 
-## Update pipeline.yaml
-After creating the dataset class update the `./config/pipeline.yaml` to add the `custom` dataset, notice that it follows the same structure of the `CONFIG` file, so you can just copy it and modify the links with `y` or `n`.
+# Update pipeline.yaml
+After creating the dataset class update the `./pipeline.yaml` to add the `custom` dataset:
 ```yaml
 datasets:
     funsd: y
