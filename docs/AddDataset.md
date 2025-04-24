@@ -15,39 +15,22 @@ Create manually a `custom` folder inside `./data/`, it should look like this:
     │   └── train
     │       ├── images
     │       └── labels
-    ├── custom -----------> # type-2 case
-    │   ├── sub-dataset-1 ---> # variant-1 of custom
-    │   │   ├── test
-    │   │   │   ├── images
-    │   │   │   └── labels
-    │   │   └── train
-    │   │       ├── images
-    │   │       └── labels
-    │   └── sub-dataset-2 ---> # variant-2 of custom
-    │   │   ├── test
-    │   │   │   ├── images
-    │   │   │   └── labels
-    │   │   └── train
-    │   │       ├── images
-    │   │       └── labels
-    └── ....
+    ...
 ```
+> [!NOTE]
+> `Local` type dataset only support `type-1` case
 - Inside the `train` and `test` folder put the required files explained [here](Dataset.md#dataset-format).
-
-- After this, the next steps are the same explained [here](#add-online-dataset) except:
-  - the `CONFIG` is empty
-  - the `_download()` function should be empty because it's a local dataset
 
 ## Add online dataset
 If you want to add `online` dataset follow this steps:
 
 Add a `custom.py` inside `./src/dataset/`. (It is mandatory that the character `-` should not be present in the dataset name). After creating the `.py` paste this:
 ```py
-from .dataset import Dataset
+from .dataset import OnlineDataset
 
 CONFIG = { }   # [1]
 
-class CUSTOM(Dataset):     # [2]
+class CUSTOM(OnlineDataset):     # [2]
     def __init__(
         self,
         config: dict
