@@ -1,6 +1,13 @@
 # OCR dataset generator
 This project is a tool for downloading and managing `OCR` datasets, combining online and local sources. It supports the creation of training data for `text detection` and `text recognition` for various OCR tools. This project offers 2 types of operation and they are [data-generation](#training-data-generation-process) and [label-drawing](#bounding-box-drawing-process).
 
+The goal of this project is to speed up the creation of training data by converting all data into a single format; this tool will then take care of transforming it into the format required by the various OCR systems.
+
+To add more `datasets` or `generators`, read the instructions below:
+- [Understand how datasets works](./docs/Dataset.md)
+- [Add new Dataset](./docs/AddDataset.md)
+- [Add new Generator](./docs/AddGenerator.md)
+
 <img src="./docs/Pipeline.png" width=100%>
 
 ## Supported OCR tools
@@ -114,7 +121,7 @@ To start the generation process run this command:
 python main.py --generate
 ```
 
-If the process terminates correctly then an `output` folder will appear (read [here](#data-output) for instructions on how to use the training-data):
+If the process terminates correctly then an `output` folder will appear (read [here](docs/output-data/) for instructions on how to use the training-data):
 ```
 .
 └── output
@@ -180,17 +187,5 @@ This means for each image there will be a `img_blur.png` and a `img_skew.png` in
 > [!WARNING]
 > Pay attention to some operation because it will create empty images, when it happens a `cv2` error message will appear.
 
-# Data output
-Below are shown the details of the output folders generated after the training data generation, along with instructions on how to use them. The examples below assume that both tasks are selected.
-- [doctr output](./docs/output_doctr.md)
-- [easyocr output](./docs/output_easyocr.md)
-- [mmocr output](./docs/output_mmocr.md)
-- [paddleocr output](./docs/output_paddleocr.md)
-- [yolo+trocr output](./docs/output_yolo+trocr.md)
-# Docs
-- [Understand how datasets works](./docs/Dataset.md)
-- [Add new Dataset](./docs/AddDataset.md)
-- [Add new Generator](./docs/AddGenerator.md)
-
-## Future developments
+# Future developments
 - Modify dataset to manage rotated text (?)
