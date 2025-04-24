@@ -1,4 +1,4 @@
-from src.dataset import DATASETS, CONFIG, LocalDataset
+from src.dataset import init_datasets
 from src.generator import *
 from src.utils.draw import draw_labels
 from src.utils. dataset import check_images, check_labels
@@ -21,21 +21,10 @@ def pipeline(
     args
 ) -> None:
     print(f"{Fore.LIGHTCYAN_EX}[Dataset Setup]{Fore.RESET}")
+    init_datasets(datasets)
 
-    
     # create dataset objects
     for dataset in datasets.keys():
-        if "-" in dataset:
-            root:str = dataset.split("-")[0].upper()
-            dataset_instance = DATASETS[root](CONFIG[root])
-            dataset_instance.set_subdataset(dataset)
-            datasets[dataset] = dataset_instance
-        else:
-            if dataset.upper() not in DATASETS:
-                datasets[dataset] = LocalDataset(dict(__name__ = dataset))
-            else:
-                datasets[dataset] = DATASETS[dataset.upper()](CONFIG[dataset.upper()])
-        
         # dataset setup
         dataset_instance = datasets[dataset]    
         dataset_instance.setup()
@@ -113,7 +102,6 @@ if __name__ == "__main__":
     AUGMENTATION: bool = pipeline_config["augmentation"]
 
     datasets: dict = pipeline_config["datasets"]
-    defined_classes = list(map(lambda x: str(x).lower(), list(DATASETS.keys())))
     config_classes = list(datasets.keys())
 
     selected_datasets = {}
